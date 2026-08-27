@@ -3,7 +3,10 @@
 # --- API (shared) ---
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
-pydantic==2.10.4
+# Bumped from 2.10.4 — google-genai>=2.x (below) requires pydantic>=2.11. Nikhil: if
+# anything in layer 1-3 breaks on this, ping me before re-pinning down, since the
+# Gemini SDK is what forced the bump.
+pydantic==2.13.4
 
 # --- Layer 3: intelligence (Nikhil) ---
 numpy==2.2.1
@@ -15,4 +18,9 @@ lightgbm==4.5.0              # retry-success + churn scorers
 python-dotenv==1.0.1
 httpx==0.28.1
 
-# --- Layers 5-7 (Vishaal): add LLM client + SSE deps here ---
+# --- Layers 5-7 (Vishaal) ---
+# 1.2.0 doesn't know about thought_signature, which every currently-available Gemini
+# model requires on multi-turn function calls — 400 INVALID_ARGUMENT without it. 2.20.0
+# is the version actually tested against this account's models (gemini-3.6-flash).
+google-genai==2.20.0          # Gemini free tier — agent tool-use loop
+# SSE is hand-rolled on FastAPI's StreamingResponse, no extra dependency needed.

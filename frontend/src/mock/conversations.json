@@ -1,0 +1,29 @@
+{
+  "cnv_0007": {
+    "conversation_id": "cnv_0007",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "can you do better on price?",
+        "at": "2026-08-27T19:00:16Z"
+      },
+      {
+        "role": "agent",
+        "text": "I can't offer a direct discount on the item price, but I was able to get free shipping unlocked for your order! \n\nWould you like to complete your purchase with free shipping?",
+        "at": "2026-08-27T19:03:12Z"
+      }
+    ],
+    "cart_value_inr": 22266.89,
+    "offer": {
+      "requested_rung": "TIER_2_10_PCT",
+      "granted_rung": "TIER_1_FREE_SHIPPING",
+      "granted": false,
+      "discount_inr": 0.0,
+      "shipping_waived_inr": 79.0,
+      "reason": "A 10% discount breaches the 18.0% margin floor on this cart. Denied - the agent must hold the line or offer a smaller rung.",
+      "margin_floor_pct": 18.0,
+      "decided_by": "policy_engine"
+    },
+    "done": false
+  }
+}

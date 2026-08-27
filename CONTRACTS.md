@@ -145,6 +145,33 @@ ActionStatus  PROPOSED | APPROVED | BLOCKED | EXECUTED | FAILED
 
 `NO_ACTION` is a legitimate, and sometimes the correct, outcome — Scenario 2 resolves to it.
 
+### OfferRung
+
+```
+TIER_0_HOLD_FIRM | TIER_1_FREE_SHIPPING | TIER_2_10_PCT | TIER_3_20_PCT
+```
+
+Ordered weakest to strongest concession. The cart agent may **request** any rung; the
+policy engine (`backend/guardrails/blocks.py::discount_within_margin_floor`) grants the
+highest rung that does not breach the margin floor, which may be lower than what was
+requested. `granted_rung` is authoritative — the frontend renders that, never
+`requested_rung`. `TIER_0_HOLD_FIRM` grants nothing: `discount_inr` and
+`shipping_waived_inr` are both `0.0`.
+
+*Added by Vishaal — the ladder was used in the `POST /api/chat` example below but never
+enumerated. Purely additive: no existing field, type or enum value changes.*
+
+### Window
+
+```
+PEAK | NON_PEAK
+```
+
+Used on `mandate_attempts` and in `GET /api/mandates/{mandate_id}/plan`. NPCI requires
+Autopay executions to avoid peak (morning-through-early-afternoon) entirely.
+
+*Added by Vishaal — referenced in the `/plan` example below but never enumerated.*
+
 ### MandateState
 
 ```
@@ -511,6 +538,22 @@ useless: a 2,655-cart batch outranks every real case in it.
 A single `RecoveryCase`, fully populated — `ledger_snapshot`, `guardrail_checks` and `actions`
 are always present. `404` with `CASE_NOT_FOUND` if unknown.
 
+### POST /api/cases/{case_id}/actions/{action_id}/approve
+
+*Added by Vishaal — a tier-1 (`APPROVE`) case had no way to move past `AWAITING_APPROVAL`.
+Purely additive: a new endpoint, touching no existing shape.*
+
+Moves one `Action` from `PROPOSED` to `EXECUTED` and the case from `AWAITING_APPROVAL` to
+`RESOLVED`. A human is approving an action guardrails already cleared for tier 1 — this
+endpoint does not re-run guardrails and does not let a human override a block.
+
+No request body — the POST itself is the approval; there is no reject counterpart to
+disambiguate. Response: the full, updated `RecoveryCase`.
+
+If the action's `blocked_by` is non-empty, `409 ACTION_BLOCKED_BY_GUARDRAIL` — a blocking
+guardrail failure cannot be approved around, by a human or otherwise. `404 ACTION_NOT_FOUND`
+if the action isn't on that case.
+
 ### GET /api/mandates
 
 ```json
@@ -726,7 +769,7 @@ same pacing. That path stays working — it is the fallback if the LLM rate-limi
 | HTTP | code |
 |---|---|
 | 400 | `INVALID_PARAMETER` |
-| 404 | `CASE_NOT_FOUND`, `MANDATE_NOT_FOUND`, `CONVERSATION_NOT_FOUND` |
+| 404 | `CASE_NOT_FOUND`, `MANDATE_NOT_FOUND`, `CONVERSATION_NOT_FOUND`, `ACTION_NOT_FOUND` |
 | 409 | `ACTION_BLOCKED_BY_GUARDRAIL` |
 | 429 | `LLM_RATE_LIMITED` |
 | 500 | `INTERNAL_ERROR` |
