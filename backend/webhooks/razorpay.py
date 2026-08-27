@@ -97,6 +97,8 @@ def apply_event(conn, event: str, entity: dict) -> dict:
         return {"applied": False, "reason": f"unhandled event {event}"}
 
     payment_id = entity.get("payment_id") or entity.get("id")
+    if not payment_id:
+        return {"applied": False, "reason": "no payment id on entity"}
     amount_inr = round(float(entity.get("amount", 0)) / PAISE, 2)
     customer_id = _ensure_customer(cur, entity)
     notes = entity.get("notes") or {}

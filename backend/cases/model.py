@@ -217,6 +217,27 @@ def build_summary(break_type: str, snapshot: dict, rupees: float,
         barred = evidence.get("credit_note_barred")
         return (f"{money} of GST on a reversed sale was never reclaimed"
                 + (" and the credit note is now time-barred." if barred else "."))
+    if break_type == BreakType.UNUSUAL_DISCOUNT.value:
+        rate = evidence.get("discount_rate")
+        fence = evidence.get("cohort_upper_fence")
+        if rate is not None and fence is not None:
+            return (f"Order discounted {rate:.1%}, above the {fence:.1%} cohort norm. "
+                    f"{money} is the excess beyond what similar orders discount.")
+        return f"{money} discounted beyond the normal range for this cohort."
+    if break_type == BreakType.UNUSUAL_REFUND_PATTERN.value:
+        rate = evidence.get("refund_rate")
+        fence = evidence.get("cohort_upper_fence")
+        count = evidence.get("refunded_count")
+        if rate is not None and fence is not None:
+            return (f"Customer refunded {rate:.1%} of payments, above the {fence:.1%} "
+                    f"cohort norm ({count} refund(s) totalling {money}).")
+        return f"{money} refunded at a rate far above this customer's cohort."
+    if break_type == BreakType.ANOMALOUS_TRANSACTION_PATTERN.value:
+        score = evidence.get("isolation_score")
+        if score is not None:
+            return (f"{money} transaction flagged as a multivariate outlier "
+                    f"(isolation score {score:.2f}) against normal transaction patterns.")
+        return f"{money} transaction flagged as an outlier against normal patterns."
     if break_type == BreakType.CHECKOUT_ABANDONED.value:
         cart = evidence.get("cart_value_inr")
         rate = evidence.get("recovery_rate")

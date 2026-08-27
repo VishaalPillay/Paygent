@@ -1,0 +1,97 @@
+[
+  {
+    "event": "thinking",
+    "case_id": "case_00772",
+    "seq": 0,
+    "at": "2026-08-27T18:58:50Z",
+    "text": "Payment is pending with no order on file. Let me check the ledger before concluding anything \u2014 a customer claiming a debit with no order is Scenario 2, and the right move here is almost always to wait, not refund."
+  },
+  {
+    "event": "tool_call",
+    "case_id": "case_00772",
+    "seq": 1,
+    "at": "2026-08-27T18:58:50Z",
+    "call_id": "call_1",
+    "tool": "get_ledger_snapshot",
+    "args": {
+      "payment_id": "pay_005819"
+    }
+  },
+  {
+    "event": "tool_result",
+    "case_id": "case_00772",
+    "seq": 2,
+    "at": "2026-08-27T18:58:50Z",
+    "call_id": "call_1",
+    "tool": "get_ledger_snapshot",
+    "ok": true,
+    "summary": "payment=PENDING order=MISSING inventory=AVAILABLE accounting=NOT_BOOKED, held for 205 min."
+  },
+  {
+    "event": "thinking",
+    "case_id": "case_00772",
+    "seq": 3,
+    "at": "2026-08-27T18:58:50Z",
+    "text": "Confirmed: payment is still PENDING, no order exists. In India an unconfirmed UPI payment must be auto-reversed by the acquirer within T+5 days. If I refund now from merchant balance and that auto-reversal then fires, the customer gets paid twice. The correct action is to wait for the payment to reach a terminal state."
+  },
+  {
+    "event": "tool_call",
+    "case_id": "case_00772",
+    "seq": 4,
+    "at": "2026-08-27T18:58:50Z",
+    "call_id": "call_2",
+    "tool": "propose_action",
+    "args": {
+      "action_type": "NO_ACTION",
+      "payment_id": "pay_005819",
+      "confidence": 0.92,
+      "reasoning": "Payment is still PENDING; the T+5 acquirer auto-reversal window has not closed. Refunding now risks paying the customer twice."
+    }
+  },
+  {
+    "event": "tool_result",
+    "case_id": "case_00772",
+    "seq": 5,
+    "at": "2026-08-27T18:58:50Z",
+    "call_id": "call_2",
+    "tool": "propose_action",
+    "ok": true,
+    "summary": "NO_ACTION decided: AUTO."
+  },
+  {
+    "event": "conclusion",
+    "case_id": "case_00772",
+    "seq": 6,
+    "at": "2026-08-27T18:58:50Z",
+    "break_type": "PAYMENT_PENDING_WEBHOOK_MISSING",
+    "text": "Payment is still PENDING; the T+5 acquirer auto-reversal window has not closed. Refunding now risks paying the customer twice.",
+    "recommended_action": {
+      "action_id": "act_b0d5537b",
+      "type": "NO_ACTION",
+      "status": "EXECUTED",
+      "amount_inr": null,
+      "basis": null,
+      "proposed_by": "reconciliation",
+      "decided_by": "guardrails",
+      "params": {
+        "payment_id": "pay_005819"
+      },
+      "blocked_by": [],
+      "idempotency_key": "recon:pay_005819:NO_ACTION",
+      "created_at": "2026-08-27T18:58:50Z",
+      "tier": 0,
+      "tier_label": "AUTO",
+      "guardrail_checks": [],
+      "reasoning": "Payment is still PENDING; the T+5 acquirer auto-reversal window has not closed. Refunding now risks paying the customer twice."
+    },
+    "confidence": 0.92
+  },
+  {
+    "event": "done",
+    "case_id": "case_00772",
+    "seq": 7,
+    "at": "2026-08-27T18:58:50Z",
+    "status": "RESOLVED",
+    "duration_ms": 4
+  }
+]
