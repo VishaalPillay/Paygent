@@ -64,11 +64,17 @@ None of these appear in the demo. Building them is time stolen from what does.
 
 | Area | Owner | Branch |
 |---|---|---|
-| `backend/`, `scripts/` | Vishaal | `vishaal/backend` |
+| `CONTRACTS.md` | Nikhil | `nikhil/foundation` |
+| `backend/ledgers/`, `backend/cases/`, `backend/db/`, `scripts/seed.py` | Nikhil — foundation | `nikhil/foundation` |
 | `frontend/` | Nikhil | `nikhil/frontend` |
-| `CONTRACTS.md`, `README.md` | Both, together | — |
+| `backend/guardrails/`, `agents/`, `sequencer/`, `ml/`, `api/`, `anomaly/`, `explain/`, `webhooks/` | Vishaal | `vishaal/backend` |
+| rest of `scripts/` | Vishaal | `vishaal/backend` |
+| `README.md` | Both, together | — |
 
 Do not edit files outside your area. If you need a change there, say so and let the owner make it.
+
+`CONTRACTS.md` has a single owner on purpose. Invariant 1 only works if exactly one person can
+change a shape — if you need a field added or altered, raise it with Nikhil rather than editing.
 
 ## Commands
 
