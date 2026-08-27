@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m scripts.seed)",
+      "Bash(python -m backend.ml.train)",
+      "Bash(python -m pytest:*)",
+      "Bash(uvicorn:*)",
+      "Bash(npm run:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(rm -rf:*)",
+      "Read(./.env)"
+    ]
+  }
+}
