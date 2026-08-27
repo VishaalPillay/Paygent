@@ -226,3 +226,7 @@ backend/db/paygent.db-wal
 backend/db/paygent.db-shm
 backend/ml/artifacts/*.pkl
 .python-version
+
+# frontend build tooling — reproducible via npm install / vite build
+node_modules/
+dist-shop/

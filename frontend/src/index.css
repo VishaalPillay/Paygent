@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Paygent — base layer.
+
+   The look is a typeset financial document, not a dashboard. Three rules carry
+   most of it:
+     1. Hairline rules, never cards with shadows.
+     2. Serif figures, always tabular, so columns align down the page.
+     3. Warm paper with a real grain, so the surface does not read as a screen.
+   --------------------------------------------------------------------------- */
+
+@layer base {
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+  body {
+    @apply bg-paper text-ink font-sans;
+    /* A very faint fractal grain. Two percent opacity is invisible as texture
+       but stops the background reading as flat #FFF, which is most of what
+       makes an interface feel printed rather than rendered. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+  }
+
+  /* Every figure in this product is money in a column. Tabular by default. */
+  .font-display, .tnum { font-variant-numeric: tabular-nums lining-nums; }
+
+  ::selection { background: #17140E; color: #FBF8F1; }
+}
+
+@layer components {
+  /* The small letterspaced caps that label everything. Used constantly. */
+  .label {
+    @apply font-sans text-label uppercase text-ink-3;
+    font-weight: 500;
+  }
+
+  /* A figure. Serif, tabular, tight. */
+  .figure {
+    @apply font-display tnum;
+    font-weight: 400;
+    font-variation-settings: 'opsz' 32;
+  }
+
+  /* Hairline rules do the work that borders and shadows do elsewhere. */
+  .rule    { @apply border-t border-rule; }
+  .rule-y  { @apply border-l border-rule; }
+
+  /* Confirmed vs estimated. The single most important distinction on screen,
+     so it is carried by texture as well as colour — a hatch reads as
+     "estimated" even in a photograph of the screen taken from the back row. */
+  .hatch {
+    background-image: repeating-linear-gradient(
+      -45deg, transparent 0 3px, rgba(150, 104, 28, 0.16) 3px 4px);
+  }
+  .hatch-red {
+    background-image: repeating-linear-gradient(
+      -45deg, transparent 0 3px, rgba(140, 43, 34, 0.14) 3px 4px);
+  }
+
+  /* Rows that respond without moving. A shadow would break the paper illusion,
+     so the response is a rule that darkens and an inset tint. */
+  .row-hover {
+    @apply transition-colors duration-200;
+  }
+  .row-hover:hover { background-color: #F5F1E8; }
+}
+
+/* A rule that draws itself. Used on section headers so the page assembles
+   rather than appearing. */
+@keyframes draw-rule { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.animate-rule { transform-origin: left; animation: draw-rule 900ms cubic-bezier(.2,.7,.2,1) both; }
+
+/* The live indicator on the streaming trace. */
+@keyframes breathe { 0%,100% { opacity: 1; transform: scale(1); }
+                     50%     { opacity: .45; transform: scale(.82); } }
+.animate-breathe { animation: breathe 1.8s ease-in-out infinite; }
+
+/* Scrollbars, tuned to the paper rather than left as OS chrome. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #E2DCCC; border: 3px solid #FBF8F1; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #CFC7B2; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
