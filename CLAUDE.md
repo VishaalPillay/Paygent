@@ -62,19 +62,31 @@ None of these appear in the demo. Building them is time stolen from what does.
 
 ## Ownership
 
-| Area | Owner | Branch |
-|---|---|---|
-| `CONTRACTS.md` | Nikhil | `nikhil/foundation` |
-| `backend/ledgers/`, `backend/cases/`, `backend/db/`, `scripts/seed.py` | Nikhil — foundation | `nikhil/foundation` |
-| `frontend/` | Nikhil | `nikhil/frontend` |
-| `backend/guardrails/`, `agents/`, `sequencer/`, `ml/`, `api/`, `anomaly/`, `explain/`, `webhooks/` | Vishaal | `vishaal/backend` |
-| rest of `scripts/` | Vishaal | `vishaal/backend` |
-| `README.md` | Both, together | — |
+Split by architecture layer (`docs/image.png`). Nikhil owns layers 1-3 (data + intelligence),
+Vishaal owns layers 4-7 (orchestration + UI).
+
+| Layer | Box | Area | Owner |
+|---|---|---|---|
+| 1 | Synthetic Generator, Razorpay Webhooks | `scripts/seed.py`, `backend/webhooks/` | Nikhil |
+| 2 | Four-ledger Store | `backend/ledgers/`, `backend/db/` | Nikhil |
+| 3 | Consistency Matrix | `backend/ledgers/matrix.py` | Nikhil |
+| 3 | Anomaly Detection | `backend/anomaly/` | Nikhil |
+| 3 | ML Scorers | `backend/ml/` | Nikhil |
+| 4 | Recovery Case Bus | `backend/cases/` | Vishaal |
+| 5 | Recovery Agents | `backend/agents/`, `backend/sequencer/` | Vishaal |
+| 6 | Guardrail Engine | `backend/guardrails/` | Vishaal |
+| 7 | React Dashboard | `frontend/`, `backend/api/`, `backend/explain/` | Vishaal |
+| — | `CONTRACTS.md` | Nikhil | |
+| — | `README.md` | Both, together | |
 
 Do not edit files outside your area. If you need a change there, say so and let the owner make it.
 
 `CONTRACTS.md` has a single owner on purpose. Invariant 1 only works if exactly one person can
-change a shape — if you need a field added or altered, raise it with Nikhil rather than editing.
+change a shape - if you need a field added or altered, raise it with Nikhil rather than editing.
+
+**The layer 3 -> layer 4 seam is the interface between the two halves.** Nikhil's detectors and
+scorers emit `Signal` objects; Vishaal's Case Bus consumes them and assembles `RecoveryCase`
+objects. Both shapes are defined in `CONTRACTS.md`.
 
 ## Commands
 
@@ -82,8 +94,10 @@ change a shape — if you need a field added or altered, raise it with Nikhil ra
 ./scripts/setup.sh          # deps + seed + train models
 ./scripts/run.sh            # backend :8000, frontend :5173
 ./scripts/demo_reset.sh     # wipe to clean demo state
-python -m scripts.seed      # regenerate synthetic data with labelled breaks
-python -m backend.ml.train  # retrain LightGBM, writes to backend/ml/artifacts/
+python -m scripts.seed              # regenerate synthetic data with labelled breaks
+python -m backend.ledgers.scanner   # consistency matrix -> signals
+python -m backend.anomaly.detector  # rules + outliers -> signals
+python -m backend.ml.train          # retrain LightGBM, writes to backend/ml/artifacts/
 
 cd frontend && VITE_USE_MOCK=true npm run dev   # frontend with no backend
 ```

@@ -1,288 +1,308 @@
-# Foundation plan — contracts, ledger, seed data, Command Center
+# Build plan — layers 1-4: ingestion, ledgers, intelligence, case bus
 
 Owner: Nikhil · Branch: `nikhil/foundation`
 
-This is the dependency-ordered plan for the work that unblocks everything else. Vishaal's
-backend work (`guardrails/`, `agents/`, `sequencer/`, `ml/`, `api/`) sits downstream of it.
+Work is split by architecture layer (`docs/image.png`). This plan covers **layers 1-4**:
+data ingestion, the four-ledger store, the intelligence layer, and the Recovery Case Bus.
+Vishaal owns layers 5-7 (agents, guardrails, dashboard).
 
 ---
 
 ## Context
 
 The repo was a complete scaffold with **zero implementation** — every source file 0 bytes,
-including `CONTRACTS.md`. Three things blocked parallel work:
+including `CONTRACTS.md`. Nothing downstream could start: no contract to code against, no data
+to run against, and no way to tell a break from a healthy transaction.
 
-1. **`CONTRACTS.md` was empty** but declared frozen and referenced by every rule file. Nobody
-   could write an API handler or a mock fixture without it.
-2. **No data existed.** The four-ledger model is the keystone (`docs/Project_context.md` §2) and
-   nothing downstream — detector, guardrails, agents, sequencer, ML — can run against nothing.
-3. **No screen rendered**, so no contract had ever been validated by a real consumer.
+Layers 1-3 are the half that has to exist first. They turn nothing into a populated four-ledger
+store plus a stream of scored, typed findings that layer 4 can assemble into cases.
 
-The order below writes those in dependency order, so the contract is proven by a real producer
-(seed + ledger) and a real consumer (Command Center) rather than guessed at.
+### The riskiest assumption, and how it is handled
 
-### The riskiest assumption, stated up front
+**That the legal-state matrix and the synthetic generator agree.** Authored separately they
+drift, and the detector then flags all 12,000 rows or none of them.
 
-**That the legal-state matrix and the synthetic generator agree.** If they are authored
-separately they will drift, and the detector will either flag all 10k rows or none of them.
+The mitigation is structural: **`scripts/seed.py` imports the lifecycle paths from
+`matrix.py` and walks them.** It never writes a state tuple of its own. Breaks are made by
+truncating or corrupting a walk. There is one definition of a legal state in the codebase.
 
-The mitigation is structural and is the spine of this plan: **`scripts/seed.py` imports the
-lifecycles from `matrix.py` and walks them** rather than restating them. Breaks are produced by
-deliberately corrupting a walk — never by hand-writing a state tuple. The two cannot diverge
-because there is only one definition.
+A second guard falls out of that. A ledger snapshot is **derived, never stored** — an orphan
+payment is a payment row with no matching order row, so absence *is* the `MISSING` state.
+That means some state combinations cannot be physically represented (with no order, there is
+nothing to hang an inventory or accounting row on). `seed.py` asserts representability before
+writing, so an unrepresentable snapshot fails loudly instead of silently reading back as
+something else.
 
-### Second flag — the waterfall needs two tables the four ledgers don't provide
+### The waterfall needs two tables the four ledgers do not provide
 
-The six-gate waterfall (`docs/Project_context.md` §1) cannot be derived from the four ledgers
-alone. Gate **B4** (settled to bank) and gate **B6** (statutory credits) have no source in
-payment/order/inventory/accounting. The schema therefore adds `checkout_sessions` (for B1) and
-`settlements` (for B4). Without them the bottom half of Command Center's headline chart would be
-fabricated — which is precisely the credibility claim that screen exists to make.
-
----
-
-## Ownership change
-
-`CLAUDE.md`'s table assigned all of `backend/` and `scripts/` to Vishaal, and `CONTRACTS.md` to
-"Both, together." Both were amended:
-
-| Area | Owner | Branch |
-|---|---|---|
-| `CONTRACTS.md` | Nikhil | `nikhil/foundation` |
-| `backend/ledgers/`, `backend/cases/`, `backend/db/`, `scripts/seed.py` | Nikhil — foundation | `nikhil/foundation` |
-| `frontend/` | Nikhil | `nikhil/frontend` |
-| `backend/guardrails/`, `agents/`, `sequencer/`, `ml/`, `api/`, `anomaly/`, `explain/`, `webhooks/` | Vishaal | `vishaal/backend` |
-| rest of `scripts/` | Vishaal | `vishaal/backend` |
-| `README.md` | Both, together | — |
-
-`CONTRACTS.md` has a single owner deliberately. Invariant 1 ("the contract is frozen") only
-works if exactly one person can change a shape.
+Gates **B1** (checkout → attempted) and **B4** (order → settled) have no source in
+payment/order/inventory/accounting. The schema adds `checkout_sessions` and `settlements`.
+Without them the bottom half of Command Center's headline chart would be fabricated — which is
+exactly the credibility claim that screen exists to make.
 
 ---
 
-## Phase 0 — Ownership + branch · **done**
+## Ownership
 
-Branch `nikhil/foundation` cut from `main`; `CLAUDE.md` ownership table rewritten as above.
+| Layer | Box | Area | Owner | Status |
+|---|---|---|---|---|
+| 1 | Synthetic Generator | `scripts/seed.py` | Nikhil | done |
+| 1 | Razorpay Webhooks | `backend/webhooks/razorpay.py` | Nikhil | done |
+| 2 | Four-ledger Store | `backend/ledgers/states.py`, `backend/db/` | Nikhil | done |
+| 3 | Consistency Matrix | `backend/ledgers/matrix.py`, `scanner.py` | Nikhil | done |
+| 3 | Anomaly Detection | `backend/anomaly/detector.py` | Nikhil | done |
+| 3 | ML Scorers | `backend/ml/train.py` | Nikhil | done |
+| — | `CONTRACTS.md` | Nikhil | done |
+| 4 | Recovery Case Bus | `backend/cases/model.py`, `bus.py` | Nikhil | done |
+| 5 | Recovery Agents | `backend/agents/`, `backend/sequencer/` | Vishaal | — |
+| 6 | Guardrail Engine | `backend/guardrails/` | Vishaal | — |
+| 7 | React Dashboard | `frontend/`, `backend/api/` | Vishaal | — |
 
-Land this first so Vishaal can start on `guardrails/` — pure Python with zero dependency on
-data or contract — while the rest is in flight.
+`CONTRACTS.md` has a single owner deliberately. Invariant 1 only works if exactly one person
+can change a shape.
 
-## Phase 1 — `backend/ledgers/states.py` · **done**
+---
 
-Four `str, Enum` ledgers so they serialise straight to JSON and compare as strings:
+## The seam between the two halves
 
-```
-PaymentState      INITIATED PENDING AUTHORIZED CAPTURED FAILED REFUNDED
-OrderState        MISSING CREATED CONFIRMED FULFILLED CANCELLED
-InventoryState    NOT_APPLICABLE AVAILABLE RESERVED SHIPPED RETURNED
-AccountingState   NOT_BOOKED DEFERRED REVENUE_RECOGNIZED REVERSED
-```
+Layer 3 writes `Signal` rows. Layer 4 reads them and assembles `RecoveryCase` objects.
 
-Plus `BusinessType`, `MandateState`, `FailureReasonCode`, `AFA_THRESHOLD_INR = 15000.0`,
-`MAX_ATTEMPTS_PER_CYCLE = 4`, and `NON_TERMINAL_PAYMENT_STATES`.
+The handoff is a **table**, not a function call, so either half can be built and tested before
+the other exists. `Signal` is defined in `CONTRACTS.md` §2 and in `backend/db/schema.sql`.
 
-`NON_TERMINAL_PAYMENT_STATES` is defined **only here** and consumed by
-`guardrails/blocks.py::refund_requires_terminal_payment`. It must not be redefined elsewhere.
-SaaS rows use `InventoryState.NOT_APPLICABLE` — never `None`, never `""`.
+A signal states a *finding*. It never proposes an action, names a resolver, or sets a tier —
+those are layer 4 and layer 6 decisions. `basis` is set by the emitter and never rewritten
+downstream: a `modelled` signal cannot become a `deterministic` case.
 
-## Phase 2 — `CONTRACTS.md` · **done**
+---
 
-Moved ahead of the seed so Vishaal is unblocked earlier. Six sections: conventions, enums, core
-objects, REST, SSE, fixture map. Highlights:
+## What was built
 
-- **Money**: float, rupees, `_inr` suffix. **Time**: ISO 8601 UTC with trailing `Z`.
-- **`basis`** (`deterministic` | `modelled`) sits beside every rupee figure that could be
-  either, and the two are never summed. Where a total is needed the contract returns *two*
-  totals — `GET /api/cases` returns `totals_at_risk.deterministic_inr` and `.modelled_inr`.
-- **`GET /api/summary`** returns four separate counters: `recovered_inr`,
-  `awaiting_approval_inr`, `deterministic_at_risk_inr`, `modelled_at_risk_inr`.
-- **Waterfall buckets carry `basis` per bucket** (B1–B6), plus chain invariants
-  (`buckets[i].exiting_inr == buckets[i+1].entering_inr`) that are directly checkable and that
-  the frontend may assume.
-- **`priority_score`** is defined normatively — `rupees_at_risk_inr × urgency × confidence` over
-  a 7-day deadline horizon — so backend and frontend sort identically and no LLM touches it.
-- **SSE** defines all seven event types with a common `{case_id, seq, at}` envelope, `seq`
-  ordering, and `done` always last including after `error`.
+### Layer 2 — `backend/ledgers/states.py`
 
-## Phase 3 — `backend/ledgers/matrix.py` — the keystone
+Four `str, Enum` ledgers plus `BusinessType`, `MandateState`, `FailureReasonCode`, `BreakType`
+(18 values), `AFA_THRESHOLD_INR = 15000.0`, `MAX_ATTEMPTS_PER_CYCLE = 4`, and
+`NON_TERMINAL_PAYMENT_STATES`.
 
-Enumerate what is **legal**; treat everything else as a break. Legality is derived from healthy
-lifecycles, not a 600-cell hand audit.
+That last set is defined **only here** and consumed by
+`guardrails/blocks.py::refund_requires_terminal_payment`. It must not be redefined in
+`guardrails/`. SaaS rows use `InventoryState.NOT_APPLICABLE` — never `None`, never `""`.
 
-`LEGAL_ECOMMERCE` (~9 tuples) and `LEGAL_SAAS` (~9, inventory pinned to `NOT_APPLICABLE`),
-expressed as ordered walks that `seed.py` imports and replays.
+### Layer 3 — `backend/ledgers/matrix.py`
 
-**Time is the fourth dimension.** A legal-but-only-briefly tuple needs an entry in **both**
-`DWELL_LIMITS_SECONDS` and `DWELL_BREAKS`, or it can never break:
+Enumerates what is **legal** and treats everything else as a break. 9 legal e-commerce states,
+9 legal SaaS states, derived from the lifecycle walks the generator replays.
+
+Time is the fourth dimension. A legal-but-only-briefly state needs an entry in **both**
+`DWELL_LIMITS_SECONDS` and `DWELL_BREAKS`, or it can never break. An import-time assertion
+enforces that the two dicts have identical keys.
 
 | Tuple | Dwell | Break on exceed |
 |---|---|---|
-| `INITIATED + MISSING` | 900s | `CHECKOUT_ABANDONED` |
-| `PENDING + MISSING` | 1800s | `PAYMENT_PENDING_WEBHOOK_MISSING` ← **Scenario 2** |
-| `AUTHORIZED + CREATED` | 3600s | `AUTHORIZED_NOT_CAPTURED` |
-| `CAPTURED + CONFIRMED + NOT_BOOKED` | 3600s | `REVENUE_NOT_BOOKED` |
+| `INITIATED + MISSING` | 15 min | `CHECKOUT_ABANDONED` |
+| `PENDING + MISSING` | 30 min | `PAYMENT_PENDING_WEBHOOK_MISSING` ← Scenario 2 |
+| `AUTHORIZED + CREATED` | 1 hr | `AUTHORIZED_NOT_CAPTURED` |
+| `CAPTURED + CONFIRMED + NOT_BOOKED` | 1 hr | `REVENUE_NOT_BOOKED` |
 | `CAPTURED + CONFIRMED + DEFERRED` (e-comm) | 2 days | `FULFILMENT_STALLED` |
 | `FAILED + CONFIRMED` (SaaS grace) | 4 days | `MANDATE_DEBIT_FAILED` |
 
-`NAMED_BREAKS` covers the illegal tuples we can name — `ORPHAN_PAYMENT_NO_ORDER` (Scenario 1),
-`REFUND_WITHOUT_CANCELLATION` and `REFUND_AFTER_SHIPMENT` (Scenario 3),
-`PAYMENT_ON_CANCELLED_ORDER`.
-
-```python
-def classify_break(payment, order, inventory, accounting,
-                   age_seconds, business_type) -> BreakType | None
-```
-
-Resolution order, exactly this:
-
-1. In the legal set **and** within dwell (or no dwell limit) → `None`
-2. In the legal set but dwell exceeded → `DWELL_BREAKS[tuple]`
-3. In `NAMED_BREAKS` → that break type
-4. **Anything else → `UNCLASSIFIED_BREAK`**
-
-Step 4 is the open-world property — a demo point, not a fallback. `None` means healthy: not
-`False`, not `""`.
+Resolution order in `classify_break` is normative: legal-and-within-dwell → `None`; legal but
+overstayed → dwell break; a named illegal combination → that break; **anything else →
+`UNCLASSIFIED_BREAK`**.
 
 **Never add a row to `LEGAL_*` to silence a false positive.** That is how this engine goes blind.
 
-## Phase 4 — Schema + seed
+### Layer 3 — `backend/ledgers/scanner.py`
 
-### 4a. `backend/db/schema.sql` + `conn.py`
+Joins the four ledgers, reconstructs each snapshot, runs `classify_break`, writes signals.
 
-SQLite via stdlib `sqlite3`. **No pandas, no numpy in the seed path** — this host runs Python
-3.14, where LightGBM/pandas wheels may not resolve. A stdlib-only seed means the foundation is
-never blocked on Vishaal's ML environment.
+Abandoned carts get a second pass, since they have no payment row at all. Only carts above
+₹2,000 and under 14 days old become individual signals; the rest roll into waterfall gate B1.
+A finance team abandons a tool that hands them 18,000 findings, and the cart agent can only
+work the recoverable tail.
 
-| Table | Purpose |
-|---|---|
-| `customers` | id, name, email, phone, business_type, segment, bank |
-| `_latent_traits` | `salary_day` per customer — **separate table by design** |
-| `checkout_sessions` | feeds waterfall gate B1 |
-| `payments` | state, amount_inr, method, failure_reason_code, utr, timestamps |
-| `orders` | state, payment_id, amount_inr |
-| `inventory_events` | state, sku, qty |
-| `accounting_entries` | state, amount_inr, gst_rate, invoice_id, credit_note_id |
-| `settlements` | gross / mdr / fees / net — feeds gate B4 |
-| `mandates` | state, cap_inr, next_debit_at |
-| `mandate_attempts` | cycle, attempt_no, slot_at, outcome |
-| `cases` | persisted `RecoveryCase` |
+### Layer 3 — `backend/anomaly/detector.py`
 
-`_latent_traits` is physically separate so `backend/ml/train.py` cannot accidentally join it.
-The model must **rediscover** salary timing — feature importance putting
-`days_since_predicted_salary` on top is a demo beat, and it is worthless if the column was
-handed to the model.
+A different question from the matrix: *is this strange even though every ledger is legal?*
+Three kinds of finding, and `basis` differs by kind — business rules are `deterministic`
+(arithmetic on a published fee schedule or statute), statistical outliers and IsolationForest
+patterns are `modelled` (the threshold is a choice, not a law).
 
-### 4b. `scripts/seed.py`
+Unclaimed GST is split on the same principle: past 30 November of the following FY the credit
+note is barred and the loss is a fact (`deterministic`); inside the window it is still
+claimable, so the exposure is `modelled`.
 
-10k orders, 2k subscriptions. Imports lifecycles from `matrix.py` and walks them.
+### Layer 3 — `backend/ml/train.py`
 
-- Healthy majority ~85%, walked to a terminal legal tuple.
-- ~65% checkout abandonment, feeding gate B1.
-- Labelled breaks, made by truncating or corrupting a walk: ~300 Scenario 1 orphan payments,
-  ~150 Scenario 2 pending + webhook missing, ~120 Scenario 3 refund without cancellation, and
-  **~40 deliberately unhandled tuples** that must surface as `UNCLASSIFIED_BREAK`.
-- Mandates mixing ACTIVE with REVOKED / EXPIRED / above-cap, so `sequencer/router.py` has
-  structurally unretryable cases to refuse.
-- Failures clustered against each customer's latent `salary_day`.
-- Amounts straddling **₹15,000** so both sides of the AFA threshold are represented.
-- Fixed RNG seed — `demo_reset.sh` must reproduce identical data.
+Two LightGBM models, both trained from the same SQLite database, under 4 seconds total.
 
-Ground-truth facts the generator respects (`docs/Project_context.md` §4): max 4 attempts per
-cycle, non-peak execution windows, GST slabs 5/18/40%, TCS 0.5%. **No equalisation levy** — it
-is abolished, and a rule for it would be a confident, permanent false positive.
+**The salary signal is rediscovered, never handed over.** `_latent_traits` holds each
+customer's true `salary_day` and is never joined here. Instead the pay day is estimated from
+*observed outcomes*, then fed in as `days_since_predicted_salary`.
 
-### 4c. `backend/cases/model.py` + `detector.py`
+The estimator inverts the generating process rather than taking an argmax: for every candidate
+pay day, measure how strongly `(day - s) mod 30` correlates with failure and take the strongest.
+With ~15 attempts per customer, the single best-performing day is mostly noise, and a linear
+ramp has no spike to find.
 
-`RecoveryCase` dataclass matching the contract, then a detector that scans joined ledger rows,
-calls `classify_break`, and emits one case per break. `priority_score` computed here, in
-deterministic code.
+Two corrections made during the build, both worth knowing about:
 
-### 4d. Mock derivation
+- **Churn was leaking.** Mandate state was drawn independently and then behaviour was forced to
+  100% failure, so `failure_rate` was exactly 1.0 for every dead mandate — AUC 0.998, and the
+  model was reading its own answer. Regenerating so churn is an *outcome* of mounting failures
+  brought it to a believable 0.916.
+- **The retry model was learning a rule that is not its job.** Over-cap, revoked and expired
+  mandates fail every time by rule; `router.py` rejects them deterministically before the
+  scorer runs. Training on them let `amount_to_cap_ratio` dominate. Restricting the training
+  set to router-eligible attempts put `days_since_predicted_salary` at the top where it belongs.
 
-The same script dumps `frontend/src/mock/*.json` from the identical rows it wrote to SQLite.
-Both demo paths carry real data, `VITE_USE_MOCK=true` stays truthful, and mock drift becomes
-structurally impossible rather than something `/contract-check` has to catch.
+### Layer 1 — `backend/webhooks/razorpay.py`
 
-## Phase 5 — Screen 1: Command Center
+FastAPI router (mounted by Vishaal's `main.py`). HMAC-SHA256 signature verification, enforced
+whenever `RAZORPAY_WEBHOOK_SECRET` is set. Writes are idempotent on `payment_id`, so Razorpay
+redelivery cannot double-apply.
 
-### 5a. Bootstrap the frontend
-
-`package.json`, `vite.config.js`, `index.html`, `main.jsx`, `App.jsx`, `index.css` and both
-config files are all 0 bytes — the app does not exist yet.
-
-- **Pin Tailwind `3.4.x`.** The scaffold's `tailwind.config.js` + `postcss.config.js` pair is
-  the v3 layout; v4 drops the config file and moves the PostCSS plugin to
-  `@tailwindcss/postcss`. Not worth hackathon time.
-- React + Vite + Tailwind + Recharts, nothing else. No state library, no component library, no
-  animation library.
-- `api.js` switches on `VITE_USE_MOCK` between `fetch` and the seeded fixtures.
-
-### 5b. The screen
-
-Command Center proves the problem exists *before* any product is shown. It contains **zero AI
-features by design** — its only job is making an invisible gap visible.
-
-- **`Waterfall.jsx`** — six gates, each labelled in rupees with its `basis`. Recharts has no
-  native waterfall: build it as a stacked `BarChart` with a transparent lower segment and the
-  visible segment as the loss. The one non-obvious piece; comment it.
-- **`RecoveredCounter.jsx`** — `recovered_inr` (the only number here that proves the product
-  *works* rather than merely observes), `awaiting_approval_inr`, and an at-risk card rendering
-  deterministic and modelled as **two labelled figures, never added**.
-- **`CaseCard.jsx` + feed** — sorted by `priority_score` descending. A prioritised queue, not a
-  log; finance teams abandon tools that dump 4,000 findings on them.
-- **`Nav.jsx`** — routes for all five screens; the four unbuilt ones render a clean placeholder,
-  not a blank page.
-
-### 5c. Empty and loading states
-
-Every component needs both. A screen showing nothing mid-demo reads as broken even when it is
-fine. This matters more than polish.
-
-**Every number on screen is in rupees.** Never "4,231 anomalies detected."
+`DEMO_DROP_WEBHOOK=1` verifies and acknowledges the event, then deliberately does not apply it.
+The payment stays `PENDING` with no order — past its dwell limit, exactly Scenario 2. Nothing
+is faked: the on-stage break is produced by the same code path that would have resolved it.
 
 ---
 
-## Verification
+## Bugs found in review, and fixed
 
-Run in order; do not move past a failing step.
+A dedicated bug pass after the build found five defects. All are fixed and covered by the
+verification below.
 
-1. **Matrix, before any data exists.** All three scenarios from §6 of the context doc, plus a
-   healthy row, plus a deliberately unhandled tuple. If `UNCLASSIFIED_BREAK` stops firing on the
-   unhandled case, the open-world property is broken and the demo claim is now false.
+**1. Signal id collision — crashed on any re-run.** The three detectors each generated
+`sig_000001…` from independent counters (the scanner from zero, the others from `COUNT(*)`).
+Running them twice, or in a different order, hit `UNIQUE constraint failed: signals.signal_id`.
+Ids are now source-prefixed (`sig_cm_`, `sig_an_`, `sig_ml_`) with a counter local to each
+detector, so every one is idempotent and order-independent.
 
-2. **Seed and inspect** — `python -m scripts.seed`, then via `sqlite3`: 10k orders / 2k subs,
-   healthy:break ratio ≈ 85:15, every intended break type present at least once,
-   `UNCLASSIFIED_BREAK` count non-zero.
+**2. Scanner JOIN fan-out — latent, but certain to fire.** `inventory_events` and
+`accounting_entries` are event logs; one order legitimately carries reserve → ship → return.
+The scanner joined every row, multiplying the payment and emitting a duplicate signal per
+event. It happened to be 1:1 in the seed, so nothing showed — but the webhook already writes
+inventory rows, and any real fulfilment flow writes several. Each ledger now contributes only
+its latest row.
 
-3. **Detector agreement.** Zero cases on rows the generator walked as healthy; a case on every
-   row it deliberately corrupted. A mismatch means matrix and generator have diverged — fix the
-   matrix, never the label.
+**3. No time anchor — every break would reclassify itself overnight.** The seed is generated
+relative to a fixed instant, but detectors defaulted to `datetime.now()`. Dwell comparisons
+would drift as the wall clock moved, silently reclassifying in-flight transactions as breaks.
+A `meta` table now stores `reference_now` and all three detectors measure against it.
 
-4. **Waterfall arithmetic.** Sum the six gate losses straight from SQLite and check the chain
-   invariants reconcile against `gross_intended_inr` and `realised_inr`. Confirm no bucket mixes
-   deterministic and modelled rupees into one figure.
+**4. Seven declared break types had no data.** `AUTHORIZED_NOT_CAPTURED`,
+`REVENUE_NOT_BOOKED`, `FULFILMENT_STALLED`, `MANDATE_DEBIT_FAILED`,
+`PAYMENT_ON_CANCELLED_ORDER`, `DUPLICATE_PAYMENT` and `MANDATE_UNRETRYABLE` were in the enum
+and the contract but nothing produced them. `MANDATE_DEBIT_FAILED` mattered most — it is the
+entire retry-sequencer story, and `age_within()` capped every failed renewal *inside* its
+four-day grace so the break could never fire. The generator now injects dwell breaks
+explicitly, and the scanner gained two detections it was missing: `DUPLICATE_PAYMENT` (a
+second captured payment on one checkout) and `MANDATE_UNRETRYABLE` (a revoked, expired or
+over-cap mandate against a still-active subscription).
 
-5. **Determinism.** `demo_reset.sh` then re-seed reproduces identical data.
+`DUPLICATE_PAYMENT` takes precedence over the per-payment classification deliberately. A
+duplicate also looks like an orphan, but calling it one sends the resolver down the
+create-the-missing-order path when the correct action is a refund.
 
-6. **Screen 1, both paths.** `cd frontend && VITE_USE_MOCK=true npm run dev` — six gates render,
-   counters show rupees with the at-risk split intact, feed ordered by `priority_score`. Then
-   repeat against the live backend and confirm the two render identically. That is the real
-   proof the contract holds.
+**5. Smaller correctness fixes.** Wildcard expansion in `matrix.py` tested truthiness rather
+than `is not None`. Abandoned-cart signals hardcoded e-commerce inventory state regardless of
+business type. IsolationForest findings were labelled `UNUSUAL_DISCOUNT`, conflating two
+different methods — they now carry `ANOMALOUS_TRANSACTION_PATTERN`. Signals worth zero rupees
+are dropped at the writer rather than left for layer 4 to filter.
 
-7. **Force the empty path.** Point the app at an empty result set. No screen renders blank.
+---
 
-8. **`/contract-check`** — backend, mocks and contract agree before handing off.
+### Layer 4 — `backend/cases/model.py` + `bus.py`
+
+Reads `Signal` rows and assembles `RecoveryCase` objects. **Not one case per signal** — 5,601
+signals would produce a queue nobody works, which is the alert-fatigue failure that kills
+reconciliation tools. Per break type the highest-value signals become individual cases and the
+tail rolls into one aggregate. Result: **1,601 individual cases + 9 batch actions**.
+
+Deadlines come from the domain, not a generic SLA: the T+5 acquirer credit-adjustment window,
+the NPCI 4-attempts-per-cycle limit, the 30-November GST credit-note bar, and a one-day courier
+recall window for goods already in transit.
+
+Three invariants the bus holds, each verified:
+
+- **No case mixes bases.** `STATUTORY_CREDIT_UNCLAIMED` emits both, so the aggregation key is
+  `(break_type, business_type, basis)`.
+- **`tier` is left NULL.** Guardrails owns it; a fabricated tier reads downstream as "safe to
+  auto-execute".
+- **Every signal is accounted for** — cased or rolled up, 5,601 of 5,601, none dropped.
+
+Four bugs found and fixed during this build:
+
+1. **The individual cap only counted the current run**, so a second incremental pass sailed
+   past it — 60 became 120. The per-group counter now seeds from existing cases.
+2. **`case_id` was sequenced from `COUNT(*)`**, which collides after any delete. Now taken from
+   the highest id in use.
+3. **The new `case_signals` foreign key blocked every detector from clearing its own signals.**
+   The whole pipeline failed on re-run — and because I had suppressed stderr, three runs
+   silently did nothing while I read stale numbers as if they were fresh.
+   `db.clear_signals()` now walks the dependency chain in order.
+4. **Abandoned carts were booked as `deterministic` at full cart value** — Rs 35.3M of a
+   Rs 62.7M "confirmed money at risk" total. The customer never paid: the full value is a real
+   leak (waterfall gate B1) but the *recoverable* amount is a ~12% proposition. They now carry
+   a modelled recoverable estimate, which moved the deterministic total to Rs 25.9M and put the
+   largest number in the system on the correct side of the split the product is built on.
+
+---
+
+## Verification — all passing
+
+```bash
+python -m scripts.seed              # 12,070 payments · 28,571 sessions · 31,000+ attempts
+python -m backend.ledgers.scanner   # consistency matrix -> 4,652 signals
+python -m backend.anomaly.detector  # rules + outliers   -> 933 signals
+python -m backend.ml.train          # LightGBM -> artifacts + churn signals
+python -m backend.cases.bus         # signals -> 1,610 cases
+```
+
+Run them in that order. Each detector clears and rebuilds its own signals plus any cases
+derived from them, so re-running one mid-chain is safe.
+
+1. **Matrix, before any data exists.** All three scenarios, healthy rows, grace-period
+   boundaries and deliberately unhandled tuples classify correctly. Across the full
+   600-combination space, 491 fall to `UNCLASSIFIED_BREAK` — the open-world property holds.
+2. **Detector agreement, exact.** Every injected break type is detected at exactly the injected
+   count: 300 orphans, 150 pending-webhook, 120 out-of-band refunds, 110 stalled fulfilment,
+   90 unbooked revenue, 80 uncaptured authorisations, 70 duplicates, 60 payments on cancelled
+   orders, 40 unclassified. Zero misses, zero false positives on the healthy majority.
+3. **No duplicate signals per payment**, including after a second inventory event is added to
+   an order — the fan-out regression is covered directly.
+4. **Idempotent and order-independent.** All three detectors re-run in any order; 5,601 signals,
+   5,601 distinct ids, zero collisions.
+5. **Determinism.** Two consecutive seeds produce a byte-identical fingerprint across all ten
+   ledger tables.
+6. **Signal integrity.** No zero-value signals, `basis` always one of the two legal values,
+   `confidence` always within 0..1, `break_type` always in the enum.
+7. **Time anchor.** `reference_now` is stored in `meta` and no ledger row postdates it.
+8. **Break-type coverage.** All 19 declared break types have data behind them.
+9. **Honest metrics.** retry_success AUC 0.786, churn AUC 0.926, both held out. Salary
+   rediscovery 17.4% exact and 73.6% within 7 days, against 3.3% and 50% for chance, with
+   `days_since_predicted_salary` the top feature by gain.
+10. **Webhook.** Normal capture writes both ledgers; redelivery is idempotent (one order, not
+    two); dropped mode writes nothing and produces the break; a bad signature returns 401.
+11. **Case bus.** Rebuild is idempotent (1,610 → 1,610); no case mixes bases; every case has a
+    resolver and a deadline; `tier` is NULL on all of them; `priority_score` recomputed
+    independently from the contract formula over 500 cases with zero mismatches; the individual
+    cap survives an incremental run; all detectors still re-run with cases in the database.
 
 ---
 
 ## Handoff to Vishaal
 
-Once this lands he is unblocked, in demo-priority order: `guardrails/blocks.py`
-(`refund_requires_terminal_payment` — the centrepiece), `agents/loop.py` plus the SSE stream,
-Case Detail's live half, then `sequencer/` and `ml/`.
+Read `CONTRACTS.md` §2 for `Signal` and `RecoveryCase`, then `SELECT * FROM signals` — 4,245
+rows are already there. Layer 4 has everything it needs; it does not have to wait on anything.
 
-Two things to tell him explicitly:
+Three things to know:
 
 - `NON_TERMINAL_PAYMENT_STATES` lives in `backend/ledgers/states.py`. Do not redefine it in
   `guardrails/`.
-- `_latent_traits` is off-limits to `ml/train.py`. The salary signal must be rediscovered.
+- `_latent_traits` is off-limits to anything that trains or scores. The salary signal is
+  rediscovered on purpose, and joining that table would make the result meaningless.
+- `router.py` must reject structurally unretryable mandates (revoked, expired, over cap) before
+  `scorer.py` is consulted. The retry model is trained on that assumption — it has never seen a
+  structurally doomed attempt and will score one nonsensically.

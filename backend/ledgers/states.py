@@ -107,3 +107,40 @@ AFA_THRESHOLD_INR = 15000.0
 
 # NPCI: max 4 attempts per mandate cycle — 1 original + 3 retries. Then the cycle is dead.
 MAX_ATTEMPTS_PER_CYCLE = 4
+
+
+class BreakType(str, Enum):
+    """Every way the four ledgers can disagree.
+
+    Defined here rather than in matrix.py so that every consumer — the consistency
+    matrix, the anomaly detector, and the Case Bus downstream — shares one import.
+    """
+
+    # --- dwell breaks: legal states that lasted too long ---
+    CHECKOUT_ABANDONED = "CHECKOUT_ABANDONED"
+    PAYMENT_PENDING_WEBHOOK_MISSING = "PAYMENT_PENDING_WEBHOOK_MISSING"
+    AUTHORIZED_NOT_CAPTURED = "AUTHORIZED_NOT_CAPTURED"
+    REVENUE_NOT_BOOKED = "REVENUE_NOT_BOOKED"
+    FULFILMENT_STALLED = "FULFILMENT_STALLED"
+    MANDATE_DEBIT_FAILED = "MANDATE_DEBIT_FAILED"
+
+    # --- named breaks: illegal combinations we can explain ---
+    ORPHAN_PAYMENT_NO_ORDER = "ORPHAN_PAYMENT_NO_ORDER"
+    REFUND_WITHOUT_CANCELLATION = "REFUND_WITHOUT_CANCELLATION"
+    REFUND_AFTER_SHIPMENT = "REFUND_AFTER_SHIPMENT"
+    PAYMENT_ON_CANCELLED_ORDER = "PAYMENT_ON_CANCELLED_ORDER"
+    DUPLICATE_PAYMENT = "DUPLICATE_PAYMENT"
+    MANDATE_UNRETRYABLE = "MANDATE_UNRETRYABLE"
+
+    # --- anomaly-sourced breaks (backend/anomaly/) ---
+    SETTLEMENT_SHORT_PAID = "SETTLEMENT_SHORT_PAID"
+    STATUTORY_CREDIT_UNCLAIMED = "STATUTORY_CREDIT_UNCLAIMED"
+    UNUSUAL_DISCOUNT = "UNUSUAL_DISCOUNT"
+    UNUSUAL_REFUND_PATTERN = "UNUSUAL_REFUND_PATTERN"
+    ANOMALOUS_TRANSACTION_PATTERN = "ANOMALOUS_TRANSACTION_PATTERN"
+
+    # --- ML-sourced breaks (backend/ml/) — always basis "modelled" ---
+    SUBSCRIPTION_CHURN_RISK = "SUBSCRIPTION_CHURN_RISK"
+
+    # --- the open-world catch. A feature, not a fallback. ---
+    UNCLASSIFIED_BREAK = "UNCLASSIFIED_BREAK"

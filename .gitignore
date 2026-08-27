@@ -219,3 +219,10 @@ __marimo__/
 
 CLAUDE.local.md
 .claude/settings.local.json
+# Paygent generated artifacts — reproducible from a fixed seed, never committed.
+# Rebuild with: python -m scripts.seed && python -m backend.ml.train
+backend/db/paygent.db
+backend/db/paygent.db-wal
+backend/db/paygent.db-shm
+backend/ml/artifacts/*.pkl
+.python-version

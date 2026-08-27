@@ -81,6 +81,7 @@ ECOMMERCE | SAAS
 
 ```
 CHECKOUT_ABANDONED                 checkout initiated, no payment attempt, past dwell
+                                   (always `modelled` — see the note under `basis`)
 PAYMENT_PENDING_WEBHOOK_MISSING    payment pending, no order, past dwell        (Scenario 2)
 AUTHORIZED_NOT_CAPTURED            authorised, never captured, past dwell
 ORPHAN_PAYMENT_NO_ORDER            money captured, no order record              (Scenario 1)
@@ -94,6 +95,10 @@ MANDATE_DEBIT_FAILED               autopay debit failed, subscription in grace
 MANDATE_UNRETRYABLE                failure is structural — revoked, expired, over cap
 SETTLEMENT_SHORT_PAID              settled net is below expected net of known fees
 STATUTORY_CREDIT_UNCLAIMED         GST credit note / TCS credit not reclaimed
+UNUSUAL_DISCOUNT                   discount rate outside the cohort distribution
+UNUSUAL_REFUND_PATTERN             refund frequency far outside the customer cohort
+ANOMALOUS_TRANSACTION_PATTERN      multivariate outlier from IsolationForest
+SUBSCRIPTION_CHURN_RISK            scorer predicts the subscription lapses (always modelled)
 UNCLASSIFIED_BREAK                 ledger combination outside the legal set
 ```
 
@@ -162,6 +167,16 @@ unretryable. `backend/sequencer/router.py` must never spend an attempt on them.
 ```
 deterministic | modelled
 ```
+
+**A worked example of the distinction, because the largest number in the system turns on it.**
+An abandoned cart's full value is a real, deterministic leak and appears as such in waterfall
+gate B1 — we definitively did not collect it. But the *recoverable* amount on the resulting
+case is a fraction of that, because the customer never paid and cart-recovery campaigns land
+around 12%. So `CHECKOUT_ABANDONED` signals and cases carry the modelled recoverable estimate
+with `basis: "modelled"`, and `evidence.cart_value_inr` preserves the full leak.
+
+Booking the full cart value as `deterministic` would put roughly half of all "confirmed money
+at risk" on the wrong side of the split the whole product is built on.
 
 ---
 
@@ -269,6 +284,9 @@ One case object per detected break. The spine of the whole system.
   "tier": 2,
   "tier_label": "INVESTIGATE_ONLY",
 
+  "signal_count": 1,
+  "is_aggregate": false,
+
   "ledger_snapshot": { "...": "LedgerSnapshot" },
   "guardrail_checks": [ { "...": "GuardrailResult" } ],
   "actions": [ { "...": "Action" } ],
@@ -295,6 +313,87 @@ is `priority_score` descending.
 **Money rules on this object:** `rupees_at_risk_inr` means nothing without its `basis`. Never
 sum `rupees_at_risk_inr` across cases of differing `basis` — sum within a basis and return two
 figures.
+
+**`tier` is `null` until guardrails has run.** The Case Bus never sets it. A fabricated tier
+reads downstream as "safe to auto-execute", so absence must stay visible as absence.
+`guardrail_checks` and `actions` are `[]` for the same reason.
+
+**Aggregation — `is_aggregate` and `signal_count`.** The bus does not emit one case per signal.
+Around 5,600 signals would produce a queue no finance team ever works. Per break type the
+highest-value signals become individual cases; the remainder roll into **one aggregate case**
+carrying `is_aggregate: true`, `signal_count: N`, and the summed rupees. Break types where
+every instance is its own investigation (orphan payments, pending webhooks, duplicates) are
+uncapped and never aggregate.
+
+An aggregate never spans two bases. `STATUTORY_CREDIT_UNCLAIMED` emits both deterministic and
+modelled signals, so the grouping key is `(break_type, business_type, basis)`.
+
+`customer_id` is `null` on an aggregate — it covers many customers. `signal_id` is `null` too;
+the members are in the `case_signals` table.
+
+**Aggregates are ranked in their own lane.** An aggregate holds a far larger total than any
+single case, so sorting them together puts a batch permanently at the top of a queue that is
+supposed to answer "what do I work on next?". `priority_score` is computed by the same
+normative formula for both — the separation belongs to the reader, not the number. See the
+`include_aggregates` parameter on `GET /api/cases`.
+
+---
+
+### Signal — the layer 3 → layer 4 seam
+
+**This is the interface between the two halves of the build.** Layer 3 (consistency matrix,
+anomaly detection, ML scorers) emits `Signal` objects. Layer 4 (Recovery Case Bus) consumes them
+and assembles `RecoveryCase` objects.
+
+Signals are written to the `signals` table in `backend/db/schema.sql`, not passed by function
+call, so either half can be built and tested before the other exists.
+
+```json
+{
+  "signal_id": "sig_00291",
+  "source": "consistency_matrix",
+  "break_type": "PAYMENT_PENDING_WEBHOOK_MISSING",
+  "business_type": "ECOMMERCE",
+
+  "customer_id": "cus_1042",
+  "session_id": "ses_7731",
+  "payment_id": "pay_881f2",
+  "order_id": null,
+  "mandate_id": null,
+
+  "rupees_at_risk_inr": 2499.0,
+  "basis": "deterministic",
+  "confidence": 0.92,
+
+  "ledger_snapshot": { "...": "LedgerSnapshot" },
+  "evidence": {
+    "dwell_limit_seconds": 1800,
+    "observed_age_seconds": 5400,
+    "webhook_received": false
+  },
+  "detected_at": "2026-08-27T18:30:00Z"
+}
+```
+
+`source` is lowercase, one of:
+
+| source | emitted by | typical basis |
+|---|---|---|
+| `consistency_matrix` | `backend/ledgers/matrix.py::classify_break` | `deterministic` |
+| `anomaly` | `backend/anomaly/detector.py` | `deterministic` for rule hits, `modelled` for outlier scores |
+| `ml_scorer` | `backend/ml/` | `modelled` |
+
+**Rules on this object:**
+
+- A signal states a *finding*. It never proposes an action, names a resolver, or sets a tier —
+  those are layer 4 and layer 6 decisions.
+- `basis` is set by the emitter and is never rewritten downstream. A `modelled` signal cannot
+  become a `deterministic` case.
+- `confidence` from `consistency_matrix` is `1.0` for a named break — the ledgers either
+  disagree or they do not. Anomaly and ML signals carry a real score below `1.0`.
+- `evidence` is a free-form object, but every key must be a fact, not a sentence. Narration is
+  `backend/explain/`'s job.
+- One signal per detected break. Deduplication across sources is layer 4's problem.
 
 ---
 
@@ -384,6 +483,8 @@ Query parameters, all optional:
 | `limit` | int | `50` |
 | `offset` | int | `0` |
 | `sort` | `-priority_score` \| `-created_at` \| `-rupees_at_risk_inr` | `-priority_score` |
+| `include_aggregates` | bool — `false` returns the individual work queue, `true` returns both | `false` |
+| `aggregates_only` | bool — the batch-actions strip on its own | `false` |
 
 ```json
 {
@@ -399,6 +500,11 @@ Query parameters, all optional:
 ```
 
 `totals_at_risk` reflects the *filtered* set. Two figures, never one.
+
+**`include_aggregates` defaults to `false` on purpose.** The default response is the work
+queue — individual, actionable cases. Aggregates are fetched deliberately, for a separate
+batch-actions strip in the UI. Returning both in one priority-sorted list makes the feed
+useless: a 2,655-cart batch outranks every real case in it.
 
 ### GET /api/cases/{case_id}
 
@@ -531,9 +637,40 @@ the frontend renders that, never the requested one.
 
 ### POST /api/webhooks/razorpay
 
-Razorpay test-mode events. Returns `200` with `{"ok": true, "case_id": "case_0417" | null}` as
-fast as possible — detection runs after the response. A dropped webhook is simulated by not
-calling this endpoint at all, which is what produces the live broken state on stage.
+Razorpay test-mode events. Owned by `backend/webhooks/razorpay.py` (layer 1); mounted by
+`backend/main.py`. Acknowledges fast — detection runs on the next scan, not in the handler.
+
+Request is the raw Razorpay event body, signed with HMAC-SHA256 over the webhook secret in the
+`X-Razorpay-Signature` header. An invalid signature returns `401 INVALID_SIGNATURE`. Signature
+verification is enforced whenever `RAZORPAY_WEBHOOK_SECRET` is set and skipped when it is not,
+so local `curl` testing works without one.
+
+Response:
+
+```json
+{
+  "ok": true,
+  "dropped": false,
+  "event": "payment.captured",
+  "applied": true,
+  "payment_id": "pay_Nx8kQ2mLd91Fgh",
+  "state": "CAPTURED",
+  "amount_inr": 2499.0
+}
+```
+
+Handled events: `payment.authorized`, `payment.captured`, `payment.failed`, `refund.created`,
+`refund.processed`. Anything else returns `"applied": false` with a reason. Writes are
+idempotent on `payment_id`, so Razorpay's redelivery cannot double-apply.
+
+**The dropped-webhook demo.** With `DEMO_DROP_WEBHOOK=1` the endpoint verifies and acknowledges
+the event, then deliberately does not apply it, returning `"dropped": true`. The payment stays
+`PENDING` with no order — which past its dwell limit is exactly
+`PAYMENT_PENDING_WEBHOOK_MISSING`. Nothing is faked: the broken state on stage is produced by
+the same code path that would otherwise have resolved it.
+
+Amounts arrive from Razorpay in **paise** and are converted to rupee floats at the boundary.
+Paise never appear anywhere else in the system.
 
 ---
 

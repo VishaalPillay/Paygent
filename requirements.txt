@@ -1,0 +1,18 @@
+# Python 3.12 — see .python-version. LightGBM has no wheels for 3.14.
+
+# --- API (shared) ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+
+# --- Layer 3: intelligence (Nikhil) ---
+numpy==2.2.1
+pandas==2.2.3
+scikit-learn==1.6.0          # IsolationForest — anomaly detection
+lightgbm==4.5.0              # retry-success + churn scorers
+
+# --- Layer 1: webhooks (Nikhil) ---
+python-dotenv==1.0.1
+httpx==0.28.1
+
+# --- Layers 5-7 (Vishaal): add LLM client + SSE deps here ---
