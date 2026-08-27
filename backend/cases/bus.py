@@ -241,11 +241,46 @@ def run(conn, now: datetime | None = None, rebuild: bool = True) -> dict:
             "aggregate": n_aggregate, "signals": len(signals)}
 
 
+# Share of cases given a closed outcome so the Command Center has a believable
+# 90-day history behind it. Real outcomes come from layers 5 and 6 — an agent
+# resolves a case and guardrails approve the action. Until those exist, a demo
+# with an empty "Recovered" counter shows nothing working, so we stamp a
+# plausible history onto older, already-past-deadline cases and nothing else.
+DEMO_RESOLVED_SHARE = 0.09
+DEMO_AWAITING_SHARE = 0.03
+
+
+def assign_demo_outcomes(conn, seed: int = 20260827) -> dict[str, int]:
+    """Stamp RESOLVED / AWAITING_APPROVAL onto a deterministic subset.
+
+    Demo scaffolding, not business logic. Deterministic on `seed` so the numbers
+    on screen never move between runs.
+    """
+    import random
+    rng = random.Random(seed)
+    rows = [r["case_id"] for r in conn.execute(
+        "SELECT case_id FROM cases WHERE is_aggregate = 0 ORDER BY case_id")]
+    rng.shuffle(rows)
+    n_res = int(len(rows) * DEMO_RESOLVED_SHARE)
+    n_awa = int(len(rows) * DEMO_AWAITING_SHARE)
+    resolved, awaiting = rows[:n_res], rows[n_res:n_res + n_awa]
+
+    conn.executemany("UPDATE cases SET status='RESOLVED' WHERE case_id=?",
+                     [(c,) for c in resolved])
+    conn.executemany("UPDATE cases SET status='AWAITING_APPROVAL' WHERE case_id=?",
+                     [(c,) for c in awaiting])
+    conn.commit()
+    return {"resolved": len(resolved), "awaiting_approval": len(awaiting)}
+
+
 def main() -> None:
     conn = db.connect()
     stats = run(conn, rebuild=True)
+    outcomes = assign_demo_outcomes(conn)
     print(f"  {stats['signals']:,} signals -> {stats['cases']:,} cases "
-          f"({stats['individual']:,} individual, {stats['aggregate']} aggregate)\n")
+          f"({stats['individual']:,} individual, {stats['aggregate']} aggregate)")
+    print(f"  demo outcomes: {outcomes['resolved']:,} resolved, "
+          f"{outcomes['awaiting_approval']:,} awaiting approval\n")
 
     print(f"  {'resolver':<16} {'cases':>7} {'signals':>9}")
     print(f"  {'-'*16} {'-'*7} {'-'*9}")

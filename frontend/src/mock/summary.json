@@ -1,0 +1,243 @@
+{
+  "generated_at": "2026-08-27T18:00:00Z",
+  "currency": "INR",
+  "counters": {
+    "recovered_inr": 1850971.49,
+    "awaiting_approval_inr": 585340.69,
+    "deterministic_at_risk_inr": 24293177.53,
+    "modelled_at_risk_inr": 8413389.93
+  },
+  "case_counts": {
+    "open": 1418,
+    "investigating": 0,
+    "awaiting_approval": 48,
+    "blocked": 0,
+    "resolved": 144,
+    "expired": 0
+  },
+  "resolver_counts": {
+    "CART": 61,
+    "RECONCILIATION": 1304,
+    "SEQUENCER": 245
+  },
+  "waterfall": {
+    "gross_intended_inr": 385210184.75,
+    "realised_inr": 97509461.9,
+    "buckets": [
+      {
+        "id": "B1",
+        "stage": "Checkout initiated \u2192 Payment attempted",
+        "basis": "deterministic",
+        "entering_inr": 385210184.75,
+        "leaked_inr": 234470516.6,
+        "exiting_inr": 150739668.15,
+        "case_count": 18571,
+        "detail": "Carts with no payment attempt"
+      },
+      {
+        "id": "B2",
+        "stage": "Payment attempted \u2192 Payment authorised",
+        "basis": "deterministic",
+        "entering_inr": 150739668.15,
+        "leaked_inr": 17925277.7,
+        "exiting_inr": 132814390.45,
+        "case_count": 1456,
+        "detail": "Declines, technical and business"
+      },
+      {
+        "id": "B3",
+        "stage": "Payment authorised \u2192 Order recognised",
+        "basis": "deterministic",
+        "entering_inr": 132814390.45,
+        "leaked_inr": 4527665.95,
+        "exiting_inr": 128286724.5,
+        "case_count": 370,
+        "detail": "Money captured against no order"
+      },
+      {
+        "id": "B4",
+        "stage": "Order recognised \u2192 Settled to bank",
+        "basis": "modelled",
+        "entering_inr": 128286724.5,
+        "leaked_inr": 13618918.04,
+        "exiting_inr": 114667806.46,
+        "case_count": 1007,
+        "detail": "Fees, holds and short-pay"
+      },
+      {
+        "id": "B5",
+        "stage": "Settled to bank \u2192 Net of reversals",
+        "basis": "deterministic",
+        "entering_inr": 114667806.46,
+        "leaked_inr": 16529801.94,
+        "exiting_inr": 98138004.52,
+        "case_count": 1320,
+        "detail": "Refunds and chargebacks"
+      },
+      {
+        "id": "B6",
+        "stage": "Net of reversals \u2192 Realised",
+        "basis": "modelled",
+        "entering_inr": 98138004.52,
+        "leaked_inr": 628542.62,
+        "exiting_inr": 97509461.9,
+        "case_count": 379,
+        "detail": "Statutory credits never reclaimed"
+      }
+    ]
+  },
+  "by_break_type": [
+    {
+      "break_type": "MANDATE_UNRETRYABLE",
+      "resolver": "SEQUENCER",
+      "basis": "deterministic",
+      "case_count": 53,
+      "rupees_at_risk_inr": 10681045.26,
+      "signal_count": 741
+    },
+    {
+      "break_type": "CHECKOUT_ABANDONED",
+      "resolver": "CART",
+      "basis": "modelled",
+      "case_count": 53,
+      "rupees_at_risk_inr": 4390558.33,
+      "signal_count": 2707
+    },
+    {
+      "break_type": "ORPHAN_PAYMENT_NO_ORDER",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 278,
+      "rupees_at_risk_inr": 3455018.04,
+      "signal_count": 278
+    },
+    {
+      "break_type": "SUBSCRIPTION_CHURN_RISK",
+      "resolver": "SEQUENCER",
+      "basis": "modelled",
+      "case_count": 15,
+      "rupees_at_risk_inr": 2260206.0,
+      "signal_count": 15
+    },
+    {
+      "break_type": "MANDATE_DEBIT_FAILED",
+      "resolver": "SEQUENCER",
+      "basis": "deterministic",
+      "case_count": 146,
+      "rupees_at_risk_inr": 1945118.97,
+      "signal_count": 146
+    },
+    {
+      "break_type": "PAYMENT_PENDING_WEBHOOK_MISSING",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 140,
+      "rupees_at_risk_inr": 1784405.15,
+      "signal_count": 140
+    },
+    {
+      "break_type": "FULFILMENT_STALLED",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 102,
+      "rupees_at_risk_inr": 1341870.53,
+      "signal_count": 102
+    },
+    {
+      "break_type": "REVENUE_NOT_BOOKED",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 81,
+      "rupees_at_risk_inr": 946313.0,
+      "signal_count": 81
+    },
+    {
+      "break_type": "AUTHORIZED_NOT_CAPTURED",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 69,
+      "rupees_at_risk_inr": 892166.53,
+      "signal_count": 69
+    },
+    {
+      "break_type": "DUPLICATE_PAYMENT",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 64,
+      "rupees_at_risk_inr": 734575.62,
+      "signal_count": 64
+    },
+    {
+      "break_type": "PAYMENT_ON_CANCELLED_ORDER",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 58,
+      "rupees_at_risk_inr": 724455.06,
+      "signal_count": 58
+    },
+    {
+      "break_type": "REFUND_WITHOUT_CANCELLATION",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 55,
+      "rupees_at_risk_inr": 695111.85,
+      "signal_count": 55
+    },
+    {
+      "break_type": "ANOMALOUS_TRANSACTION_PATTERN",
+      "resolver": "RECONCILIATION",
+      "basis": "modelled",
+      "case_count": 58,
+      "rupees_at_risk_inr": 673429.39,
+      "signal_count": 96
+    },
+    {
+      "break_type": "STATUTORY_CREDIT_UNCLAIMED",
+      "resolver": "RECONCILIATION",
+      "basis": "modelled",
+      "case_count": 78,
+      "rupees_at_risk_inr": 616088.75,
+      "signal_count": 375
+    },
+    {
+      "break_type": "REFUND_AFTER_SHIPMENT",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 52,
+      "rupees_at_risk_inr": 564620.83,
+      "signal_count": 52
+    },
+    {
+      "break_type": "UNCLASSIFIED_BREAK",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 38,
+      "rupees_at_risk_inr": 429584.37,
+      "signal_count": 38
+    },
+    {
+      "break_type": "UNUSUAL_REFUND_PATTERN",
+      "resolver": "RECONCILIATION",
+      "basis": "modelled",
+      "case_count": 6,
+      "rupees_at_risk_inr": 273023.13,
+      "signal_count": 6
+    },
+    {
+      "break_type": "UNUSUAL_DISCOUNT",
+      "resolver": "RECONCILIATION",
+      "basis": "modelled",
+      "case_count": 46,
+      "rupees_at_risk_inr": 200084.33,
+      "signal_count": 131
+    },
+    {
+      "break_type": "SETTLEMENT_SHORT_PAID",
+      "resolver": "RECONCILIATION",
+      "basis": "deterministic",
+      "case_count": 74,
+      "rupees_at_risk_inr": 98892.32,
+      "signal_count": 303
+    }
+  ]
+}

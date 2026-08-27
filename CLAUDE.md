@@ -51,6 +51,9 @@ open files in that area. Do not duplicate them here.
 4. **An LLM never picks a number that moves money.** It may propose. A deterministic layer decides.
 5. **Guardrails contain no LLM calls.** `backend/guardrails/` is pure Python logic, forever.
 6. **No new dependencies** beyond `requirements.txt` and `package.json` without asking first.
+   One agreed exception: `framer-motion` in the frontend. CSS transitions cannot do spring
+   physics, layout animation or exit animation, and the interface being visibly hand-crafted
+   is a judged quality here. Nothing else gets added on that reasoning.
 7. All timestamps are ISO 8601 UTC with a trailing `Z`.
 
 ## Do not build
@@ -75,7 +78,8 @@ Vishaal owns layers 4-7 (orchestration + UI).
 | 4 | Recovery Case Bus | `backend/cases/` | Vishaal |
 | 5 | Recovery Agents | `backend/agents/`, `backend/sequencer/` | Vishaal |
 | 6 | Guardrail Engine | `backend/guardrails/` | Vishaal |
-| 7 | React Dashboard | `frontend/`, `backend/api/`, `backend/explain/` | Vishaal |
+| 7 | React Dashboard | `backend/api/`, `backend/explain/` | Vishaal |
+| 7 | Frontend UI | `frontend/` | Nikhil |
 | — | `CONTRACTS.md` | Nikhil | |
 | — | `README.md` | Both, together | |
 
