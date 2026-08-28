@@ -1,0 +1,352 @@
+{
+  "items": [
+    {
+      "mandate_id": "mdt_000260",
+      "customer_id": "cus_002760",
+      "customer_name": "Rohan Mehta",
+      "age": 22,
+      "persona": "young_adult",
+      "bank": "PNB",
+      "segment": "REPEAT",
+      "state": "ACTIVE",
+      "cap_inr": 21551.68,
+      "debit_amount_inr": 9997.86,
+      "requires_afa": false,
+      "cycle": "2026-07",
+      "next_debit_at": "2026-09-02T18:00:00Z",
+      "attempts_used": 1,
+      "attempts_remaining": 3,
+      "last_failure_reason": "INSUFFICIENT_FUNDS",
+      "predicted_salary_day": 8,
+      "at_risk_inr": 9997.86,
+      "basis": "deterministic",
+      "router_verdict": {
+        "retryable": true,
+        "reason": "Failure looks like a timing issue, not a structural one \u2014 eligible for retry.",
+        "checks": [
+          {
+            "name": "mandate_is_active",
+            "passed": true,
+            "blocking": true,
+            "message": "Mandate mdt_000260 is ACTIVE. Safe to schedule a retry.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          },
+          {
+            "name": "amount_within_mandate_cap",
+            "passed": true,
+            "blocking": true,
+            "message": "Rs 9,997.86 is within the Rs 21,551.68 mandate cap.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          },
+          {
+            "name": "attempts_remain_in_cycle",
+            "passed": true,
+            "blocking": true,
+            "message": "3 attempt(s) remain this cycle.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          }
+        ]
+      },
+      "predicted_success": 0.6848,
+      "predicted_basis": "modelled",
+      "naive": {
+        "strategy": "NAIVE",
+        "attempts": [
+          {
+            "attempt_no": 2,
+            "slot_at": "2026-09-01T10:00:00Z",
+            "window": "PEAK",
+            "predicted_success": 0.6164,
+            "reason": "Blind retry on the 1st of next cycle, no slot selection"
+          }
+        ],
+        "expected_recovery_inr": 6162.68,
+        "basis": "modelled"
+      },
+      "sequenced": {
+        "strategy": "SEQUENCED",
+        "attempts": [
+          {
+            "attempt_no": 2,
+            "slot_at": "2026-08-28T22:30:00Z",
+            "window": "NON_PEAK",
+            "predicted_success": 0.6848,
+            "reason": "Highest predicted success among non-peak slots this cycle"
+          },
+          {
+            "attempt_no": 3,
+            "slot_at": "2026-09-08T22:30:00Z",
+            "window": "NON_PEAK",
+            "predicted_success": 0.9943,
+            "reason": "Highest predicted success among non-peak slots this cycle"
+          },
+          {
+            "attempt_no": 4,
+            "slot_at": "2026-09-09T22:30:00Z",
+            "window": "NON_PEAK",
+            "predicted_success": 0.9585,
+            "reason": "Highest predicted success among non-peak slots this cycle"
+          }
+        ],
+        "expected_recovery_inr": 9997.11,
+        "basis": "modelled"
+      },
+      "uplift_inr": 3834.43,
+      "uplift_basis": "modelled"
+    },
+    {
+      "mandate_id": "mdt_000384",
+      "customer_id": "cus_002884",
+      "customer_name": "Aarav Bose",
+      "age": 41,
+      "persona": "middle_age",
+      "bank": "BoB",
+      "segment": "VIP",
+      "state": "ACTIVE",
+      "cap_inr": 59094.21,
+      "debit_amount_inr": 44886.31,
+      "requires_afa": true,
+      "cycle": "2026-07",
+      "next_debit_at": "2026-09-15T18:00:00Z",
+      "attempts_used": 1,
+      "attempts_remaining": 3,
+      "last_failure_reason": "ISSUER_DECLINED",
+      "predicted_salary_day": 6,
+      "at_risk_inr": 44886.31,
+      "basis": "deterministic",
+      "router_verdict": {
+        "retryable": true,
+        "reason": "Failure looks like a timing issue, not a structural one \u2014 eligible for retry.",
+        "checks": [
+          {
+            "name": "mandate_is_active",
+            "passed": true,
+            "blocking": true,
+            "message": "Mandate mdt_000384 is ACTIVE. Safe to schedule a retry.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          },
+          {
+            "name": "amount_within_mandate_cap",
+            "passed": true,
+            "blocking": true,
+            "message": "Rs 44,886.31 is within the Rs 59,094.21 mandate cap.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          },
+          {
+            "name": "attempts_remain_in_cycle",
+            "passed": true,
+            "blocking": true,
+            "message": "3 attempt(s) remain this cycle.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          }
+        ]
+      },
+      "predicted_success": 0.9909,
+      "predicted_basis": "modelled",
+      "naive": {
+        "strategy": "NAIVE",
+        "attempts": [
+          {
+            "attempt_no": 2,
+            "slot_at": "2026-09-01T10:00:00Z",
+            "window": "PEAK",
+            "predicted_success": 0.4725,
+            "reason": "Blind retry on the 1st of next cycle, no slot selection"
+          }
+        ],
+        "expected_recovery_inr": 21208.78,
+        "basis": "modelled"
+      },
+      "sequenced": {
+        "strategy": "SEQUENCED",
+        "attempts": [
+          {
+            "attempt_no": 2,
+            "slot_at": "2026-09-06T15:30:00Z",
+            "window": "NON_PEAK",
+            "predicted_success": 0.9909,
+            "reason": "Highest predicted success among non-peak slots this cycle"
+          },
+          {
+            "attempt_no": 3,
+            "slot_at": "2026-09-07T15:30:00Z",
+            "window": "NON_PEAK",
+            "predicted_success": 0.9629,
+            "reason": "Highest predicted success among non-peak slots this cycle"
+          },
+          {
+            "attempt_no": 4,
+            "slot_at": "2026-09-08T15:30:00Z",
+            "window": "NON_PEAK",
+            "predicted_success": 0.9552,
+            "reason": "Highest predicted success among non-peak slots this cycle"
+          }
+        ],
+        "expected_recovery_inr": 44885.63,
+        "basis": "modelled"
+      },
+      "uplift_inr": 23676.85,
+      "uplift_basis": "modelled"
+    },
+    {
+      "mandate_id": "mdt_001191",
+      "customer_id": "cus_003691",
+      "customer_name": "Arjun Iyer",
+      "age": 67,
+      "persona": "senior_revoked",
+      "bank": "SBI",
+      "segment": "NEW",
+      "state": "REVOKED",
+      "cap_inr": 118584.07,
+      "debit_amount_inr": 44962.07,
+      "requires_afa": true,
+      "cycle": "2025-11",
+      "next_debit_at": "2026-09-12T18:00:00Z",
+      "attempts_used": 1,
+      "attempts_remaining": 3,
+      "last_failure_reason": "AFA_NOT_COMPLETED",
+      "predicted_salary_day": 26,
+      "at_risk_inr": 44962.07,
+      "basis": "deterministic",
+      "router_verdict": {
+        "retryable": false,
+        "reason": "Mandate mdt_001191 is REVOKED. This is structural, not a timing failure - no retry can succeed. Do not spend an attempt on it.",
+        "checks": [
+          {
+            "name": "mandate_is_active",
+            "passed": false,
+            "blocking": true,
+            "message": "Mandate mdt_001191 is REVOKED. This is structural, not a timing failure - no retry can succeed. Do not spend an attempt on it.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          },
+          {
+            "name": "amount_within_mandate_cap",
+            "passed": true,
+            "blocking": true,
+            "message": "Rs 44,962.07 is within the Rs 118,584.07 mandate cap.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          },
+          {
+            "name": "attempts_remain_in_cycle",
+            "passed": true,
+            "blocking": true,
+            "message": "3 attempt(s) remain this cycle.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          }
+        ]
+      },
+      "predicted_success": 0.0,
+      "predicted_basis": "modelled",
+      "naive": {
+        "strategy": "NAIVE",
+        "attempts": [],
+        "expected_recovery_inr": 0.0,
+        "basis": "modelled"
+      },
+      "sequenced": {
+        "strategy": "SEQUENCED",
+        "attempts": [],
+        "expected_recovery_inr": 0.0,
+        "basis": "modelled"
+      },
+      "uplift_inr": 0.0,
+      "uplift_basis": "modelled"
+    },
+    {
+      "mandate_id": "mdt_001745",
+      "customer_id": "cus_004245",
+      "customer_name": "Reyansh Das",
+      "age": 60,
+      "persona": "senior_over_cap",
+      "bank": "Kotak",
+      "segment": "REPEAT",
+      "state": "ACTIVE",
+      "cap_inr": 31881.12,
+      "debit_amount_inr": 44908.3,
+      "requires_afa": true,
+      "cycle": "2026-07",
+      "next_debit_at": "2026-09-09T18:00:00Z",
+      "attempts_used": 4,
+      "attempts_remaining": 0,
+      "last_failure_reason": "AMOUNT_EXCEEDS_MANDATE_CAP",
+      "predicted_salary_day": 13,
+      "at_risk_inr": 44908.3,
+      "basis": "deterministic",
+      "router_verdict": {
+        "retryable": false,
+        "reason": "Rs 44,908.30 exceeds the Rs 31,881.12 mandate cap. The bank will decline this every time - retrying wastes an attempt on a failure that cannot resolve itself.",
+        "checks": [
+          {
+            "name": "mandate_is_active",
+            "passed": true,
+            "blocking": true,
+            "message": "Mandate mdt_001745 is ACTIVE. Safe to schedule a retry.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          },
+          {
+            "name": "amount_within_mandate_cap",
+            "passed": false,
+            "blocking": true,
+            "message": "Rs 44,908.30 exceeds the Rs 31,881.12 mandate cap. The bank will decline this every time - retrying wastes an attempt on a failure that cannot resolve itself.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          },
+          {
+            "name": "attempts_remain_in_cycle",
+            "passed": false,
+            "blocking": true,
+            "message": "All 4 attempts for this cycle are used. NPCI rules make this cycle dead until the next billing period - no retry can be scheduled.",
+            "evaluated_at": "2026-08-27T23:38:59Z"
+          }
+        ]
+      },
+      "predicted_success": 0.0,
+      "predicted_basis": "modelled",
+      "naive": {
+        "strategy": "NAIVE",
+        "attempts": [],
+        "expected_recovery_inr": 0.0,
+        "basis": "modelled"
+      },
+      "sequenced": {
+        "strategy": "SEQUENCED",
+        "attempts": [],
+        "expected_recovery_inr": 0.0,
+        "basis": "modelled"
+      },
+      "uplift_inr": 0.0,
+      "uplift_basis": "modelled"
+    }
+  ],
+  "total": 4,
+  "search_days": 14,
+  "max_attempts_per_cycle": 4,
+  "afa_threshold_inr": 15000.0,
+  "model_card": {
+    "available": true,
+    "auc": 0.786,
+    "trained_at": "2026-08-27T18:00:00Z",
+    "features": [
+      {
+        "name": "days_since_predicted_salary",
+        "gain_pct": 59.4
+      },
+      {
+        "name": "amount_inr",
+        "gain_pct": 11.8
+      },
+      {
+        "name": "amount_to_cap_ratio",
+        "gain_pct": 9.4
+      },
+      {
+        "name": "day_of_month",
+        "gain_pct": 5.8
+      },
+      {
+        "name": "hour",
+        "gain_pct": 5.2
+      }
+    ]
+  },
+  "generated_at": "2026-08-27T18:00:00Z"
+}

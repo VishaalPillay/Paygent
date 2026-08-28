@@ -88,33 +88,13 @@ export default function CommandCenter({ onLoaded }) {
         </p>
 
         <motion.div variants={stagger(0.045, 0.1)} initial="hidden" animate="show" className="mt-6">
-          {queue.slice(0, 12).map((c, i) => (
+          {queue.slice(0, 6).map((c, i) => (
             <CaseCard key={c.case_id} c={c} index={i} now={summary.generated_at} />
           ))}
           <div className="border-t border-rule" />
         </motion.div>
       </section>
 
-      {/* ---- batch actions, ranked separately ------------------------------ */}
-      {aggregates.length > 0 && (
-        <section className="pb-20">
-          <div className="bg-paper-deep border border-rule px-7 py-6">
-            <div className="flex items-baseline justify-between">
-              <h2 className="font-display text-[1.375rem]">Batch actions</h2>
-              <span className="label">{aggregates.length} groups</span>
-            </div>
-            <p className="text-micro text-ink-3 mt-1 max-w-[58ch]">
-              Findings below the individual-case cut, grouped so they can be worked in one
-              pass. Ranked apart from the queue — a batch is not a next action.
-            </p>
-            <div className="mt-5">
-              {aggregates.slice(0, 5).map((c, i) => (
-                <CaseCard key={c.case_id} c={c} index={i} now={summary.generated_at} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
     </Shell>
   )
 }

@@ -93,7 +93,8 @@
       "basis": "deterministic",
       "case_count": 53,
       "rupees_at_risk_inr": 10681045.26,
-      "signal_count": 741
+      "signal_count": 741,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "CHECKOUT_ABANDONED",
@@ -101,7 +102,8 @@
       "basis": "modelled",
       "case_count": 53,
       "rupees_at_risk_inr": 4390558.33,
-      "signal_count": 2707
+      "signal_count": 2707,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "ORPHAN_PAYMENT_NO_ORDER",
@@ -109,7 +111,8 @@
       "basis": "deterministic",
       "case_count": 278,
       "rupees_at_risk_inr": 3455018.04,
-      "signal_count": 278
+      "signal_count": 278,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "SUBSCRIPTION_CHURN_RISK",
@@ -117,7 +120,8 @@
       "basis": "modelled",
       "case_count": 15,
       "rupees_at_risk_inr": 2260206.0,
-      "signal_count": 15
+      "signal_count": 15,
+      "engine": "ml_scorer"
     },
     {
       "break_type": "MANDATE_DEBIT_FAILED",
@@ -125,7 +129,8 @@
       "basis": "deterministic",
       "case_count": 146,
       "rupees_at_risk_inr": 1945118.97,
-      "signal_count": 146
+      "signal_count": 146,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "PAYMENT_PENDING_WEBHOOK_MISSING",
@@ -133,7 +138,8 @@
       "basis": "deterministic",
       "case_count": 140,
       "rupees_at_risk_inr": 1784405.15,
-      "signal_count": 140
+      "signal_count": 140,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "FULFILMENT_STALLED",
@@ -141,7 +147,8 @@
       "basis": "deterministic",
       "case_count": 102,
       "rupees_at_risk_inr": 1341870.53,
-      "signal_count": 102
+      "signal_count": 102,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "REVENUE_NOT_BOOKED",
@@ -149,7 +156,8 @@
       "basis": "deterministic",
       "case_count": 81,
       "rupees_at_risk_inr": 946313.0,
-      "signal_count": 81
+      "signal_count": 81,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "AUTHORIZED_NOT_CAPTURED",
@@ -157,7 +165,8 @@
       "basis": "deterministic",
       "case_count": 69,
       "rupees_at_risk_inr": 892166.53,
-      "signal_count": 69
+      "signal_count": 69,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "DUPLICATE_PAYMENT",
@@ -165,7 +174,8 @@
       "basis": "deterministic",
       "case_count": 64,
       "rupees_at_risk_inr": 734575.62,
-      "signal_count": 64
+      "signal_count": 64,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "PAYMENT_ON_CANCELLED_ORDER",
@@ -173,7 +183,8 @@
       "basis": "deterministic",
       "case_count": 58,
       "rupees_at_risk_inr": 724455.06,
-      "signal_count": 58
+      "signal_count": 58,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "REFUND_WITHOUT_CANCELLATION",
@@ -181,7 +192,8 @@
       "basis": "deterministic",
       "case_count": 55,
       "rupees_at_risk_inr": 695111.85,
-      "signal_count": 55
+      "signal_count": 55,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "ANOMALOUS_TRANSACTION_PATTERN",
@@ -189,7 +201,8 @@
       "basis": "modelled",
       "case_count": 58,
       "rupees_at_risk_inr": 673429.39,
-      "signal_count": 96
+      "signal_count": 96,
+      "engine": "anomaly"
     },
     {
       "break_type": "STATUTORY_CREDIT_UNCLAIMED",
@@ -197,7 +210,8 @@
       "basis": "modelled",
       "case_count": 78,
       "rupees_at_risk_inr": 616088.75,
-      "signal_count": 375
+      "signal_count": 375,
+      "engine": "anomaly"
     },
     {
       "break_type": "REFUND_AFTER_SHIPMENT",
@@ -205,7 +219,8 @@
       "basis": "deterministic",
       "case_count": 52,
       "rupees_at_risk_inr": 564620.83,
-      "signal_count": 52
+      "signal_count": 52,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "UNCLASSIFIED_BREAK",
@@ -213,7 +228,8 @@
       "basis": "deterministic",
       "case_count": 38,
       "rupees_at_risk_inr": 429584.37,
-      "signal_count": 38
+      "signal_count": 38,
+      "engine": "consistency_matrix"
     },
     {
       "break_type": "UNUSUAL_REFUND_PATTERN",
@@ -221,7 +237,8 @@
       "basis": "modelled",
       "case_count": 6,
       "rupees_at_risk_inr": 273023.13,
-      "signal_count": 6
+      "signal_count": 6,
+      "engine": "anomaly"
     },
     {
       "break_type": "UNUSUAL_DISCOUNT",
@@ -229,7 +246,8 @@
       "basis": "modelled",
       "case_count": 46,
       "rupees_at_risk_inr": 200084.33,
-      "signal_count": 131
+      "signal_count": 131,
+      "engine": "anomaly"
     },
     {
       "break_type": "SETTLEMENT_SHORT_PAID",
@@ -237,7 +255,8 @@
       "basis": "deterministic",
       "case_count": 74,
       "rupees_at_risk_inr": 98892.32,
-      "signal_count": 303
+      "signal_count": 303,
+      "engine": "anomaly"
     }
   ]
 }

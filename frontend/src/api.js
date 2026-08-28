@@ -8,6 +8,7 @@
 
 import summaryMock from './mock/summary.json'
 import casesMock from './mock/cases.json'
+import mandatesMock from './mock/mandates.json'
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
@@ -26,4 +27,5 @@ async function get(path, fallback) {
 
 export const fetchSummary = () => get('/api/summary', summaryMock)
 export const fetchCases = () => get('/api/cases?limit=60', casesMock)
+export const fetchMandates = () => get('/api/mandates', mandatesMock)
 export const isMock = USE_MOCK

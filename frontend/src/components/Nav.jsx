@@ -5,7 +5,6 @@ import { isMock } from '../api'
 
 const LINKS = [
   { to: '/', label: 'Command Center', end: true },
-  { to: '/cases', label: 'Cases' },
   { to: '/mandates', label: 'Mandates' },
   { to: '/conversations', label: 'Conversations' },
 ]

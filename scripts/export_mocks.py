@@ -13,9 +13,20 @@ Run:  python -m scripts.export_mocks
 from __future__ import annotations
 
 import json
+from datetime import timezone
 from pathlib import Path
 
 from backend.db import conn as db
+from backend.ledgers.states import AFA_THRESHOLD_INR, MAX_ATTEMPTS_PER_CYCLE
+from backend.sequencer import router as seq_router
+from backend.sequencer import solver
+
+ENGINE_BY_BREAK = {
+    "SETTLEMENT_SHORT_PAID": "anomaly", "STATUTORY_CREDIT_UNCLAIMED": "anomaly",
+    "UNUSUAL_DISCOUNT": "anomaly", "UNUSUAL_REFUND_PATTERN": "anomaly",
+    "ANOMALOUS_TRANSACTION_PATTERN": "anomaly",
+    "SUBSCRIPTION_CHURN_RISK": "ml_scorer",
+}  # everything else -> consistency_matrix
 
 OUT = Path(__file__).resolve().parent.parent / "frontend" / "src" / "mock"
 
@@ -103,6 +114,163 @@ def case_row(r) -> dict:
     }
 
 
+# The board carries 4 hand-picked mandates, not a scan-proof wall of 40. Each one
+# is a distinct persona/scenario, not a quota bucket — a judge should be able to
+# read every row. Age is a demo-only display label: the schema has no such column,
+# it's cosmetic scaffolding the same way seeded customer names are.
+PERSONAS = [
+    ("young_adult",     22, "m.state='ACTIVE' AND m.debit_amount_inr <= m.cap_inr "
+                            f"AND m.debit_amount_inr <= {AFA_THRESHOLD_INR}"),
+    ("middle_age",      41, "m.state='ACTIVE' AND m.debit_amount_inr <= m.cap_inr "
+                            f"AND m.debit_amount_inr > {AFA_THRESHOLD_INR}"),
+    ("senior_revoked",  67, "m.state='REVOKED'"),
+    ("senior_over_cap", 60, "m.state='ACTIVE' AND m.debit_amount_inr > m.cap_inr"),
+]
+
+
+def _attempts_used(c) -> dict[str, tuple[str, int]]:
+    """Attempts spent in each mandate's most recent cycle that actually has any.
+
+    Counting the current calendar month gives zero for every mandate — the seeded
+    history sits in earlier cycles — which would show all four attempts free and
+    make a *retry* plan incoherent, since a retry implies the original already
+    failed.
+    """
+    out: dict[str, tuple[str, int]] = {}
+    for r in c.execute("""SELECT mandate_id, cycle, COUNT(*) n FROM mandate_attempts
+                          GROUP BY mandate_id, cycle ORDER BY cycle"""):
+        out[r["mandate_id"]] = (r["cycle"], r["n"])   # later cycle overwrites earlier
+    return out
+
+
+def _last_failure(c) -> dict[str, str]:
+    return {r[0]: r[1] for r in c.execute(
+        """SELECT mandate_id, failure_reason_code, MAX(slot_at) FROM mandate_attempts
+           WHERE outcome='FAILED' GROUP BY mandate_id""")}
+
+
+def _salary_days(c) -> dict[str, int]:
+    """The signal the model rediscovered. Read through the same helper the scorer
+    uses so the calendar marks the day the model actually believes in."""
+    import pandas as pd
+    from backend.ml.train import estimate_salary_days
+    df = pd.read_sql_query(
+        """SELECT a.customer_id, a.slot_at, a.outcome FROM mandate_attempts a""",
+        c, parse_dates=["slot_at"])
+    return {k: int(v) for k, v in estimate_salary_days(df).to_dict().items()}
+
+
+def _model_card() -> dict:
+    """AUC and feature importance straight out of the trained artifact — the claim
+    'the model was never told salaries exist' has to be checkable, not asserted."""
+    import pickle
+    path = (Path(__file__).resolve().parent.parent
+            / "backend" / "ml" / "artifacts" / "retry_success.pkl")
+    if not path.exists():
+        return {"available": False}
+    with open(path, "rb") as f:
+        art = pickle.load(f)
+    gain = art["model"].booster_.feature_importance(importance_type="gain")
+    total = float(gain.sum()) or 1.0
+    ranked = sorted(zip(art["features"], gain), key=lambda t: -t[1])[:5]
+    return {
+        "available": True, "auc": round(float(art["auc"]), 3),
+        "trained_at": art.get("trained_at"),
+        "features": [{"name": n, "gain_pct": round(float(g) / total * 100, 1)}
+                     for n, g in ranked],
+    }
+
+
+def _naive_day1_plan(c, mandate: dict, customer: dict, used: int, now) -> dict:
+    """The demo's naive baseline: a biller who just retries blind on the 1st of the
+    next cycle. Not solver.naive_plan()'s +24h — that lands on whatever day-of-month
+    `now` happens to be, which reads as arbitrary on a 30-day cycle grid. Same real
+    scorer, a fixed and legible anchor date instead. solver.py (Vishaal's file) is
+    untouched; this only changes what date the export layer asks it to score."""
+    from backend.sequencer import scorer as seq_scorer
+    attempts_remaining = max(MAX_ATTEMPTS_PER_CYCLE - used, 0)
+    if attempts_remaining == 0:
+        return {"strategy": "NAIVE", "attempts": [], "expected_recovery_inr": 0.0, "basis": "modelled"}
+
+    nxt_month = now.month + 1 if now.month < 12 else 1
+    nxt_year = now.year if now.month < 12 else now.year + 1
+    day1 = now.replace(year=nxt_year, month=nxt_month, day=1,
+                        hour=10, minute=0, second=0, microsecond=0)
+    window = "PEAK" if day1.hour in solver.PEAK_HOURS else "NON_PEAK"
+    prob, basis = seq_scorer.score_slot(c, mandate, customer, day1, window, used + 1)
+    return {
+        "strategy": "NAIVE",
+        "attempts": [{
+            "attempt_no": used + 1,
+            "slot_at": day1.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "window": window, "predicted_success": prob,
+            "reason": "Blind retry on the 1st of next cycle, no slot selection",
+        }],
+        "expected_recovery_inr": round(mandate["debit_amount_inr"] * prob, 2),
+        "basis": basis,
+    }
+
+
+def build_mandates(c, now) -> dict:
+    used_map = _attempts_used(c)
+    fail_map = _last_failure(c)
+    salary = _salary_days(c)
+
+    picked = []
+    for persona, age, where in PERSONAS:
+        row = c.execute(
+            f"""SELECT m.*, cu.bank, cu.segment, cu.name FROM mandates m
+                JOIN customers cu ON cu.customer_id = m.customer_id
+                WHERE {where} ORDER BY m.debit_amount_inr DESC LIMIT 1""").fetchone()
+        if row is not None:
+            picked.append((row, persona, age))
+
+    items = []
+    for r, persona, age in picked:
+        m = dict(r)
+        customer = {"bank": r["bank"], "segment": r["segment"]}
+        cycle, used = used_map.get(m["mandate_id"], (m["cycle"], 0))
+        verdict = seq_router.route(m, used)
+
+        # Router first, always. A revoked mandate scheduling four confident retries
+        # would be worse than useless — mirrors backend/api/mandates.py.
+        if verdict["retryable"]:
+            naive = _naive_day1_plan(c, m, customer, used, now)
+            sequenced = solver.sequenced_plan(c, m, customer, used, now)
+        else:
+            empty = {"attempts": [], "expected_recovery_inr": 0.0, "basis": "modelled"}
+            naive = {"strategy": "NAIVE", **empty}
+            sequenced = {"strategy": "SEQUENCED", **empty}
+
+        uplift = round(sequenced["expected_recovery_inr"] - naive["expected_recovery_inr"], 2)
+        items.append({
+            "mandate_id": m["mandate_id"], "customer_id": m["customer_id"],
+            "customer_name": r["name"], "age": age, "persona": persona,
+            "bank": r["bank"], "segment": r["segment"],
+            "state": m["state"], "cap_inr": m["cap_inr"],
+            "debit_amount_inr": m["debit_amount_inr"],
+            "requires_afa": m["debit_amount_inr"] > AFA_THRESHOLD_INR,
+            "cycle": cycle, "next_debit_at": m["next_debit_at"],
+            "attempts_used": used,
+            "attempts_remaining": max(MAX_ATTEMPTS_PER_CYCLE - used, 0),
+            "last_failure_reason": fail_map.get(m["mandate_id"]),
+            "predicted_salary_day": salary.get(m["customer_id"]),
+            "at_risk_inr": m["debit_amount_inr"], "basis": "deterministic",
+            "router_verdict": verdict,
+            "predicted_success": (sequenced["attempts"][0]["predicted_success"]
+                                  if sequenced["attempts"] else 0.0),
+            "predicted_basis": "modelled",
+            "naive": naive, "sequenced": sequenced,
+            "uplift_inr": uplift, "uplift_basis": "modelled",
+        })
+
+    return {"items": items, "total": len(items),
+            "search_days": solver.SEARCH_DAYS,
+            "max_attempts_per_cycle": MAX_ATTEMPTS_PER_CYCLE,
+            "afa_threshold_inr": AFA_THRESHOLD_INR,
+            "model_card": _model_card(), "generated_at": db.get_meta(c, "reference_now")}
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     c = db.connect()
@@ -126,11 +294,16 @@ def main() -> None:
         # The queue is ordered by money, so it clusters on whichever break type
         # carries the largest tickets. This breakdown is how the breadth of the
         # engine stays visible without distorting that ordering.
+        # Each break type is produced by exactly one detection engine — see
+        # backend/ledgers/states.py BreakType comments. Grouping by engine here
+        # (rather than leaving one flat list) is what makes each of the three
+        # boxes in the architecture diagram visible on screen as its own thing.
         "by_break_type": [
             {"break_type": r["break_type"], "resolver": r["resolver"],
              "basis": r["basis"], "case_count": r["n"],
              "rupees_at_risk_inr": round(r["s"], 2),
-             "signal_count": r["sig"]}
+             "signal_count": r["sig"],
+             "engine": ENGINE_BY_BREAK.get(r["break_type"], "consistency_matrix")}
             for r in c.execute(
                 """SELECT break_type, resolver, basis, COUNT(*) n,
                           SUM(rupees_at_risk_inr) s, SUM(signal_count) sig
@@ -155,8 +328,11 @@ def main() -> None:
         },
     }
 
+    mandates = build_mandates(c, db.reference_now(c))
+
     for name, payload in (("summary", summary), ("cases", cases),
-                          ("waterfall", summary["waterfall"])):
+                          ("waterfall", summary["waterfall"]),
+                          ("mandates", mandates)):
         path = OUT / f"{name}.json"
         path.write_text(json.dumps(payload, indent=2))
         print(f"  wrote {path.relative_to(OUT.parent.parent.parent)}"

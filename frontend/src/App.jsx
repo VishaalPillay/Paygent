@@ -4,6 +4,7 @@ import { MotionConfig } from 'framer-motion'
 import Nav from './components/Nav'
 import CommandCenter from './pages/CommandCenter'
 import Conversations from './pages/Conversations'
+import MandateBoard from './pages/MandateBoard'
 
 export default function App() {
   const [generatedAt, setGeneratedAt] = useState(null)
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/" element={
             <CommandCenter onLoaded={(s) => setGeneratedAt(s.generated_at)} />} />
           <Route path="/conversations" element={<Conversations />} />
+          <Route path="/mandates" element={<MandateBoard />} />
           <Route path="*" element={<NotBuilt />} />
         </Routes>
       </div>
