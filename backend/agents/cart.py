@@ -14,20 +14,30 @@ from __future__ import annotations
 
 from ..guardrails.blocks import discount_within_margin_floor
 
-# Fixed policy for the demo — a real system would look up per-SKU cost data. Values
-# chosen so the CONTRACTS.md worked example (request TIER_3, grant TIER_1) reproduces
-# exactly: a 10% ask would also breach an 18% floor on a 25% margin, so the policy
-# skips straight past TIER_2 to the only rung that doesn't touch margin at all.
+# Per-SKU cost data — a real system would look this up from a catalog. The margin
+# floor is the same statutory-ish minimum for every product; what differs is how much
+# headroom each product's markup gives the agent above that floor before a discount
+# starts cutting into the floor itself. Unknown/missing SKU (e.g. the `_pick_cart`
+# fallback in chat.py, which has no product data) falls back to _DEFAULT_MARGIN.
 MARGIN_FLOOR_PCT = 18.0
-ASSUMED_CURRENT_MARGIN_PCT = 25.0
+_DEFAULT_MARGIN = {"margin_floor_pct": MARGIN_FLOOR_PCT, "assumed_current_margin_pct": 25.0}
+PRODUCT_MARGINS = {
+    # Renesa Ceiling Fan — commodity item, thin markup. 28 - 18 = 10% max discount.
+    "SKU-0417": {"margin_floor_pct": MARGIN_FLOOR_PCT, "assumed_current_margin_pct": 28.0},
+    # Renesa+ Smart Ceiling Fan — premium variant, wide markup. 43 - 18 = 25% max.
+    "SKU-0623": {"margin_floor_pct": MARGIN_FLOOR_PCT, "assumed_current_margin_pct": 43.0},
+}
 SHIPPING_FEE_INR = 79.0
 
-RUNG_ORDER = ["TIER_0_HOLD_FIRM", "TIER_1_FREE_SHIPPING", "TIER_2_10_PCT", "TIER_3_20_PCT"]
+RUNG_ORDER = [
+    "TIER_0_HOLD_FIRM", "TIER_1_FREE_SHIPPING", "TIER_2_10_PCT", "TIER_3_20_PCT", "TIER_4_25_PCT",
+]
 RUNG_DISCOUNT_PCT = {
     "TIER_0_HOLD_FIRM": 0.0,
     "TIER_1_FREE_SHIPPING": 0.0,  # a shipping waiver, not a product discount
     "TIER_2_10_PCT": 10.0,
     "TIER_3_20_PCT": 20.0,
+    "TIER_4_25_PCT": 25.0,
 }
 
 SYSTEM_PROMPT = """You are Paygent's cart recovery agent, texting a customer whose cart
@@ -36,11 +46,12 @@ the purchase.
 
 If they ask for a better price or free shipping, call request_offer_rung with the
 rung that matches what they're asking for (TIER_1_FREE_SHIPPING for a shipping ask,
-TIER_2_10_PCT or TIER_3_20_PCT for a discount ask). You never decide what they
-actually get — the policy engine does, and it may grant less than requested. Once you
-have the result, tell the customer exactly what was granted, never what you asked for.
-If the policy denies the full ask, hold the line politely — do not apologise
-excessively or imply you could do better if you tried harder.
+TIER_2_10_PCT, TIER_3_20_PCT or TIER_4_25_PCT for a discount ask, picking the rung
+closest to what they asked for). You never decide what they actually get — the policy
+engine does, and it may grant less than requested. Once you have the result, tell the
+customer exactly what was granted, never what you asked for. If the policy denies the
+full ask, hold the line politely — do not apologise excessively or imply you could do
+better if you tried harder.
 """
 
 TOOL_SPECS = [{
@@ -54,15 +65,20 @@ TOOL_SPECS = [{
 }]
 
 
-def decide_offer(requested_rung: str, cart_value_inr: float) -> dict:
+def decide_offer(requested_rung: str, cart_value_inr: float, sku: str | None = None) -> dict:
     """The policy engine. Grants the highest rung at or below the request that does
-    not breach the margin floor — matches CONTRACTS.md's OfferRung section exactly.
+    not breach the margin floor for this product — matches CONTRACTS.md's OfferRung
+    section, extended per-SKU (purely additive: same fields, same semantics).
     """
+    margin = PRODUCT_MARGINS.get(sku, _DEFAULT_MARGIN)
+    margin_floor_pct = margin["margin_floor_pct"]
+    current_margin_pct = margin["assumed_current_margin_pct"]
+
     if requested_rung not in RUNG_ORDER:
         requested_rung = "TIER_0_HOLD_FIRM"
 
     requested_check = discount_within_margin_floor(
-        RUNG_DISCOUNT_PCT[requested_rung], MARGIN_FLOOR_PCT, ASSUMED_CURRENT_MARGIN_PCT)
+        RUNG_DISCOUNT_PCT[requested_rung], margin_floor_pct, current_margin_pct)
 
     if requested_check.passed:
         granted_rung = requested_rung
@@ -71,7 +87,7 @@ def decide_offer(requested_rung: str, cart_value_inr: float) -> dict:
         granted_rung = "TIER_0_HOLD_FIRM"
         for rung in reversed(RUNG_ORDER[: RUNG_ORDER.index(requested_rung)]):
             check = discount_within_margin_floor(
-                RUNG_DISCOUNT_PCT[rung], MARGIN_FLOOR_PCT, ASSUMED_CURRENT_MARGIN_PCT)
+                RUNG_DISCOUNT_PCT[rung], margin_floor_pct, current_margin_pct)
             if check.passed:
                 granted_rung = rung
                 break
@@ -87,13 +103,31 @@ def decide_offer(requested_rung: str, cart_value_inr: float) -> dict:
         "discount_inr": discount_inr,
         "shipping_waived_inr": shipping_waived_inr,
         "reason": reason,
-        "margin_floor_pct": MARGIN_FLOOR_PCT,
+        "margin_floor_pct": margin_floor_pct,
         "decided_by": "policy_engine",
     }
 
 
+def open_conversation(llm, cart_value_inr: float) -> str:
+    """The agent speaks first. Cart recovery is an outbound nudge — the customer
+    already left — so there is no customer message to react to yet, and no offer
+    is decided until one is actually requested.
+    """
+    completion = llm.complete(
+        SYSTEM_PROMPT,
+        [{"role": "user", "text": (
+            f"The customer abandoned a cart worth Rs {cart_value_inr:,.2f} and hasn't "
+            "responded. Send a brief, warm opening message reminding them of their cart "
+            "and inviting them to finish checking out. Do not offer a discount unprompted."
+        )}],
+        TOOL_SPECS,
+    )
+    return completion.text or (
+        "Hey! Still thinking it over? Your cart's saved and ready whenever you are.")
+
+
 def handle_turn(
-    llm, history: list[dict], message: str, cart_value_inr: float,
+    llm, history: list[dict], message: str, cart_value_inr: float, sku: str | None = None,
 ) -> tuple[str, dict | None]:
     """One chat turn. Returns (agent_reply_text, offer_dict_or_None)."""
     messages = [*history, {"role": "user", "text": message}]
@@ -103,7 +137,7 @@ def handle_turn(
         return completion.text or "Let me see what I can do for you.", None
 
     call = completion.tool_calls[0]
-    offer = decide_offer(call.args.get("rung", "TIER_0_HOLD_FIRM"), cart_value_inr)
+    offer = decide_offer(call.args.get("rung", "TIER_0_HOLD_FIRM"), cart_value_inr, sku)
 
     messages.append({"role": "model", "tool_calls": completion.tool_calls, "text": completion.text or ""})
     messages.append({

@@ -31,6 +31,7 @@ def _case_to_dict(row: sqlite3.Row) -> dict:
     case["ledger_snapshot"] = payload.get("ledger_snapshot")
     case["guardrail_checks"] = payload.get("guardrail_checks", [])
     case["actions"] = payload.get("actions", [])
+    case["evidence"] = payload.get("evidence", {})
     case["is_aggregate"] = bool(case["is_aggregate"])
     # Only the reconciliation agent streams a reasoning trace today — sequencer and
     # cart resolve differently (a plan, a conversation), not an SSE trace. Computed
@@ -97,8 +98,18 @@ def list_cases(
             [*params, limit, offset],
         ).fetchall()
 
+        # Always present, independent of the filters above — the batch-actions
+        # strip on Command Center renders every aggregate regardless of what the
+        # main queue is currently filtered to. Not in CONTRACTS.md's documented
+        # shape, but matches what frontend/src/scripts/export_mocks.py already
+        # produces and what CommandCenter.jsx was built against.
+        aggregate_rows = conn.execute(
+            "SELECT * FROM cases WHERE is_aggregate = 1 ORDER BY rupees_at_risk_inr DESC"
+        ).fetchall()
+
         return {
             "items": [_case_to_dict(r) for r in rows],
+            "aggregates": [_case_to_dict(r) for r in aggregate_rows],
             "total": total,
             "limit": limit,
             "offset": offset,

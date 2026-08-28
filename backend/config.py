@@ -16,8 +16,11 @@ RAZORPAY_WEBHOOK_SECRET = os.getenv("RAZORPAY_WEBHOOK_SECRET", "")
 #   DEMO_DROP_WEBHOOK=1  accept the webhook and deliberately discard it, so a real
 #                        on-stage payment produces a real broken ledger state.
 #   DEMO_MODE=replay     serve recorded fixtures if the LLM rate-limits.
+#   LLM_PROVIDER=groq    swap agents/llm.py's provider without touching code —
+#                        "gemini" (default) or "groq". Both are free-tier.
 DEMO_DROP_WEBHOOK = os.getenv("DEMO_DROP_WEBHOOK", "0") == "1"
 DEMO_MODE = os.getenv("DEMO_MODE", "live")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini")
 
 # Signature verification is skipped only when no secret is configured, so local
 # curl testing works without one. Any deployment with a secret set enforces it.

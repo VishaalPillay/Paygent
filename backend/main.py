@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse  # noqa: E402
 
 from .api.cases import router as cases_router  # noqa: E402
 from .api.chat import router as chat_router  # noqa: E402
+from .api.demo import router as demo_router  # noqa: E402
 from .api.mandates import router as mandates_router  # noqa: E402
 from .api.stream import router as stream_router  # noqa: E402
 from .api.summary import router as summary_router  # noqa: E402
@@ -23,7 +24,9 @@ app = FastAPI(title="Paygent")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    # :5173 is the dashboard, :5174 is the storefront — a separate site on a
+    # separate port on purpose (see vite.shop.config.js), so both need CORS.
+    allow_origins=["http://localhost:5173", "http://localhost:5174"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -55,6 +58,7 @@ app.include_router(summary_router, prefix="/api")
 app.include_router(cases_router, prefix="/api")
 app.include_router(mandates_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
+app.include_router(demo_router, prefix="/api")
 app.include_router(stream_router, prefix="/api")
 
 

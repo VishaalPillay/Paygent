@@ -68,9 +68,34 @@ def summary() -> dict:
             for key, status in [
                 ("open", "OPEN"), ("investigating", "INVESTIGATING"),
                 ("awaiting_approval", "AWAITING_APPROVAL"), ("blocked", "BLOCKED"),
-                ("resolved", "RESOLVED"),
+                ("resolved", "RESOLVED"), ("expired", "EXPIRED"),
             ]
         }
+
+        resolver_counts = {
+            r["resolver"]: r["n"]
+            for r in conn.execute("SELECT resolver, COUNT(*) AS n FROM cases GROUP BY resolver")
+        }
+
+        # How the queue breaks down by kind of failure, not just its total — the
+        # queue itself is ordered by money and clusters on whichever break type
+        # carries the biggest tickets, which hides how many distinct things the
+        # matrix actually catches. Excludes RESOLVED for the same reason the
+        # at-risk counters do: this describes what's still outstanding.
+        by_break_type = [
+            {
+                "break_type": r["break_type"], "resolver": r["resolver"],
+                "basis": r["basis"], "case_count": r["n"],
+                "rupees_at_risk_inr": round(r["s"] or 0.0, 2),
+                "signal_count": r["sig"] or 0,
+            }
+            for r in conn.execute(
+                """SELECT break_type, resolver, basis, COUNT(*) AS n,
+                          SUM(rupees_at_risk_inr) AS s, SUM(signal_count) AS sig
+                   FROM cases WHERE status != 'RESOLVED'
+                   GROUP BY break_type, basis
+                   ORDER BY SUM(rupees_at_risk_inr) DESC""")
+        ]
 
         gross_intended = _scalar(conn, "SELECT SUM(cart_value_inr) FROM checkout_sessions")
 
@@ -136,6 +161,8 @@ def summary() -> dict:
             "currency": "INR",
             "counters": counters,
             "case_counts": case_counts,
+            "resolver_counts": resolver_counts,
+            "by_break_type": by_break_type,
             "waterfall": {
                 "gross_intended_inr": round(gross_intended, 2),
                 "realised_inr": buckets[-1]["exiting_inr"],

@@ -15,7 +15,7 @@ import time
 from datetime import datetime, timezone
 
 from . import tools
-from .llm import GeminiClient
+from .llm import GeminiClient, GroqClient
 from .reconciliation import SYSTEM_PROMPT, build_initial_prompt
 
 MAX_ITERATIONS = 6
@@ -25,7 +25,7 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def run(conn: sqlite3.Connection, case: dict, llm: GeminiClient):
+def run(conn: sqlite3.Connection, case: dict, llm: GeminiClient | GroqClient):
     """Generator of SSE-shaped event dicts investigating one case."""
     seq = 0
     started = time.monotonic()

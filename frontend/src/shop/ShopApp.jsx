@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import FanIllustration from '../components/FanIllustration'
+import TraceStream from '../components/TraceStream'
 import MiniCart from './MiniCart'
 import { useCart } from './useCart'
 import { inrExact } from '../lib/format'
@@ -13,23 +14,61 @@ import { rise, stagger, EASE } from '../lib/motion'
  * every signal it produces is a side effect of an ordinary purchase attempt.
  */
 
-const PRODUCT = {
-  sku: 'SKU-0417',
-  brand: 'Atomberg',
-  name: 'Renesa Ceiling Fan',
-  variant: '1200 mm · BLDC · Matte Black',
-  price_inr: 4299.0,
-  mrp_inr: 5990.0,
-}
+// Two products, deliberately different markup: the cart agent's discount ceiling
+// comes from agents/cart.py::PRODUCT_MARGINS, keyed by this sku — a commodity item
+// and a premium variant land on visibly different max discounts (10% vs 25%) when
+// negotiated in Conversations, not because the agent decided that, but because the
+// policy engine looked up a different margin floor for each product.
+const PRODUCTS = [
+  {
+    sku: 'SKU-0417',
+    brand: 'Atomberg',
+    name: 'Renesa Ceiling Fan',
+    variant: '1200 mm · BLDC · Matte Black',
+    price_inr: 4299.0,
+    mrp_inr: 5990.0,
+  },
+  {
+    sku: 'SKU-0623',
+    brand: 'Atomberg',
+    name: 'Renesa+ Smart Ceiling Fan',
+    variant: '1200 mm · BLDC · Wi-Fi + Remote',
+    price_inr: 6999.0,
+    mrp_inr: 9990.0,
+  },
+]
+
+const SCENARIOS = [
+  {
+    id: 'orphan_payment',
+    label: 'Payment succeeded, order not confirmed',
+    detail: 'Money moves, the merchant’s order system never hears about it.',
+  },
+  {
+    id: 'failed_but_confirmed',
+    label: 'Payment failed, order confirmed',
+    detail: 'The reverse — nobody wrote a rule for this. Watch what happens.',
+  },
+  {
+    id: 'duplicate_payment',
+    label: 'Charged twice for one checkout',
+    detail: 'The gateway retries and captures a second time on the same cart.',
+  },
+]
 
 export default function ShopApp() {
   const cart = useCart()
   const [cartOpen, setCartOpen] = useState(false)
+  const [selectedSku, setSelectedSku] = useState(PRODUCTS[0].sku)
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
-  const [paying, setPaying] = useState(false)
+  const [placing, setPlacing] = useState(false)
   const [log, setLog] = useState([])
-  const [dropWebhook, setDropWebhook] = useState(true)
+  const [activeCaseId, setActiveCaseId] = useState(null)
+  const [runningScenario, setRunningScenario] = useState(null)
+
+  const product = PRODUCTS.find((p) => p.sku === selectedSku)
+  const offPct = Math.round((1 - product.price_inr / product.mrp_inr) * 100)
 
   const push = (text, tone) =>
     setLog((l) => [...l, {
@@ -38,7 +77,7 @@ export default function ShopApp() {
     }])
 
   function addToCart() {
-    cart.add(PRODUCT, qty)
+    cart.add(product, qty)
     setAdded(true)
     setCartOpen(true)
     setTimeout(() => setAdded(false), 1800)
@@ -46,28 +85,41 @@ export default function ShopApp() {
 
   async function checkout() {
     setCartOpen(false)
-    setPaying(true)
+    setPlacing(true)
+    await new Promise((r) => setTimeout(r, 500))
+    cart.clear()
+    setPlacing(false)
+  }
+
+  async function runScenario(scenarioId) {
+    setRunningScenario(scenarioId)
+    setActiveCaseId(null)
     setLog([])
-    const wait = (ms) => new Promise((r) => setTimeout(r, ms))
-    const amount = cart.total
+    const amount = cart.total || product.price_inr * qty
 
-    push(`order created · ${cart.count} item(s) · ₹${inrExact(amount)}`)
-    await wait(700); push('UPI collect request sent to customer')
-    await wait(900); push('payment captured at gateway · pay_live_0001', 'good')
-    await wait(600); push('webhook received · payment.captured')
-    await wait(400); push('signature verified')
-    await wait(500)
-
-    if (dropWebhook) {
-      push('DEMO_DROP_WEBHOOK on — acknowledged, NOT applied', 'warn')
-      await wait(1100); push('ledgers disagree · payment CAPTURED, order MISSING', 'bad')
-      await wait(600); push(`case opened · ORPHAN_PAYMENT_NO_ORDER · ₹${inrExact(amount)}`, 'bad')
-    } else {
-      push('order confirmed, inventory reserved, revenue booked', 'good')
-      await wait(700); push('four ledgers agree · no case opened', 'good')
-      cart.clear()
+    try {
+      const res = await fetch('/api/demo/scenario', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenario: scenarioId,
+          session_id: cart.sessionId,
+          cart_value_inr: amount,
+          item_count: cart.count || qty,
+        }),
+      })
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
+      const body = await res.json()
+      body.events.forEach((e) => push(e.text, e.tone === 'neutral' ? undefined : e.tone))
+      if (body.case) {
+        push(`case ${body.case.case_id} → watch the agent audit on the right`, 'good')
+        setActiveCaseId(body.case.case_id)
+      }
+    } catch (err) {
+      push(`could not reach the backend — ${err.message}`, 'bad')
+    } finally {
+      setRunningScenario(null)
     }
-    setPaying(false)
   }
 
   return (
@@ -116,26 +168,38 @@ export default function ShopApp() {
 
           <motion.div variants={rise}>
             <div className="border border-rule bg-paper-raised p-10">
-              <FanIllustration spinning={paying} />
+              <FanIllustration spinning={placing} />
             </div>
           </motion.div>
 
           <motion.div variants={rise} className="pt-2">
-            <div className="label text-ink-3">{PRODUCT.brand}</div>
+            <div className="flex gap-2 mb-5">
+              {PRODUCTS.map((p) => (
+                <button key={p.sku} onClick={() => setSelectedSku(p.sku)}
+                  className={`label px-3 py-1.5 border transition-colors duration-200 ${
+                    p.sku === selectedSku
+                      ? 'border-ink text-ink bg-paper-deep'
+                      : 'border-rule text-ink-3 hover:text-ink-2'}`}>
+                  {p.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="label text-ink-3">{product.brand}</div>
             <h1 className="font-display text-[2.5rem] leading-[1.08] tracking-[-0.02em] mt-2">
-              {PRODUCT.name}
+              {product.name}
             </h1>
-            <p className="text-base text-ink-2 mt-2">{PRODUCT.variant}</p>
+            <p className="text-base text-ink-2 mt-2">{product.variant}</p>
 
             <div className="flex items-baseline gap-4 mt-7">
               <span className="figure text-[2.25rem] leading-none">
                 <span className="text-[0.5em] text-ink-3 font-sans mr-1">₹</span>
-                {inrExact(PRODUCT.price_inr, 0)}
+                {inrExact(product.price_inr, 0)}
               </span>
               <span className="figure text-ink-4 line-through text-[1.125rem]">
-                ₹{inrExact(PRODUCT.mrp_inr, 0)}
+                ₹{inrExact(product.mrp_inr, 0)}
               </span>
-              <span className="label text-forest">28% off</span>
+              <span className="label text-forest">{offPct}% off</span>
             </div>
             <p className="text-micro text-ink-3 mt-1.5">Inclusive of 18% GST · Free delivery</p>
 
@@ -159,10 +223,10 @@ export default function ShopApp() {
                           : 'border-ink text-ink hover:bg-paper-deep'}`}>
                 {added ? 'Added to cart' : 'Add to cart'}
               </button>
-              <button onClick={checkout} disabled={paying || !cart.count}
+              <button onClick={checkout} disabled={placing || !cart.count}
                 className="h-12 bg-ink text-paper label hover:bg-ink-2 transition-colors
                            duration-200 disabled:opacity-40 disabled:cursor-not-allowed">
-                {paying ? 'Processing…'
+                {placing ? 'Placing order…'
                   : cart.count ? `Pay with UPI · ₹${inrExact(cart.total)}`
                   : 'Add an item to pay'}
               </button>
@@ -175,55 +239,55 @@ export default function ShopApp() {
 
         {/* ---- instrumentation, kept at the bottom and clearly not the shop -- */}
         <section className="border-t-2 border-ink pt-7 pb-20">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-14">
+          <h2 className="font-display text-[1.375rem] tracking-[-0.02em]">Reconciliation demo</h2>
+          <p className="text-micro text-ink-3 mt-2 max-w-[60ch]">
+            Not part of the shop. Each button writes a real payment into the ledgers below and
+            asks the same engine that runs the seeded data to classify it — nothing here is
+            staged.
+          </p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-14 mt-7">
             <div>
-              <h2 className="font-display text-[1.375rem] tracking-[-0.02em]">Demo controls</h2>
-              <p className="text-micro text-ink-3 mt-2 max-w-[42ch]">
-                Not part of the shop. Close this tab with something in the cart and the
-                abandonment is reported the moment you leave.
-              </p>
-              <label className="flex items-start gap-4 mt-6 cursor-pointer">
-                <button onClick={() => setDropWebhook((v) => !v)}
-                  className={`mt-0.5 w-11 h-6 shrink-0 border transition-colors duration-200
-                    ${dropWebhook ? 'bg-oxblood border-oxblood' : 'bg-paper-deep border-rule-strong'}`}>
-                  <motion.span className="block w-4 h-4 bg-paper m-[3px]"
-                    animate={{ x: dropWebhook ? 20 : 0 }}
-                    transition={{ duration: 0.25, ease: EASE }} />
-                </button>
-                <span>
-                  <span className="text-[0.875rem] text-ink">Drop the payment webhook</span>
-                  <span className="block text-micro text-ink-3 mt-1 max-w-[40ch]">
-                    The confirmation is verified and acknowledged, then discarded. The payment
-                    stays captured with no order — what a lost webhook does in production.
-                  </span>
-                </span>
-              </label>
+              <div className="flex flex-col gap-3">
+                {SCENARIOS.map((s) => (
+                  <button key={s.id} onClick={() => runScenario(s.id)}
+                    disabled={runningScenario !== null}
+                    className={`text-left border p-4 transition-colors duration-200
+                      disabled:opacity-40 disabled:cursor-not-allowed
+                      ${runningScenario === s.id
+                        ? 'border-oxblood bg-oxblood-bg'
+                        : 'border-rule-strong hover:bg-paper-deep'}`}>
+                    <div className="text-[0.875rem] text-ink">
+                      {runningScenario === s.id ? 'Running…' : s.label}
+                    </div>
+                    <div className="text-micro text-ink-3 mt-1">{s.detail}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div>
-              <div className="flex items-baseline justify-between mb-3">
+            <div className="flex flex-col gap-5">
+              <div>
                 <span className="label">Event log</span>
-                {paying && (
-                  <span className="flex items-center gap-2 label text-oxblood">
-                    <span className="w-1.5 h-1.5 rounded-full bg-oxblood animate-breathe" /> live
-                  </span>
-                )}
+                <div className="border border-rule bg-paper-deep min-h-[8rem] p-5 mt-2
+                                font-mono text-[0.75rem]">
+                  {log.length === 0 && <p className="text-ink-4">Trigger a scenario above…</p>}
+                  <AnimatePresence initial={false}>
+                    {log.map((l) => (
+                      <motion.div key={l.id} initial={{ opacity: 0, x: -6 }}
+                        animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, ease: EASE }}
+                        className={`flex gap-4 py-[3px] ${
+                          l.tone === 'bad' ? 'text-oxblood' : l.tone === 'warn' ? 'text-ochre'
+                          : l.tone === 'good' ? 'text-forest' : 'text-ink-2'}`}>
+                        <span className="text-ink-4 shrink-0">{l.t}</span>
+                        <span>{l.text}</span>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
               </div>
-              <div className="border border-rule bg-paper-deep min-h-[12rem] p-5 font-mono text-[0.75rem]">
-                {log.length === 0 && <p className="text-ink-4">Waiting for a payment…</p>}
-                <AnimatePresence initial={false}>
-                  {log.map((l) => (
-                    <motion.div key={l.id} initial={{ opacity: 0, x: -6 }}
-                      animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, ease: EASE }}
-                      className={`flex gap-4 py-[3px] ${
-                        l.tone === 'bad' ? 'text-oxblood' : l.tone === 'warn' ? 'text-ochre'
-                        : l.tone === 'good' ? 'text-forest' : 'text-ink-2'}`}>
-                      <span className="text-ink-4 shrink-0">{l.t}</span>
-                      <span>{l.text}</span>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
+
+              <TraceStream caseId={activeCaseId} />
             </div>
           </div>
         </section>

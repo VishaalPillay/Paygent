@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import { MotionConfig } from 'framer-motion'
 import Nav from './components/Nav'
 import CommandCenter from './pages/CommandCenter'
+import Conversations from './pages/Conversations'
 
 export default function App() {
   const [generatedAt, setGeneratedAt] = useState(null)
@@ -17,6 +18,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={
             <CommandCenter onLoaded={(s) => setGeneratedAt(s.generated_at)} />} />
+          <Route path="/conversations" element={<Conversations />} />
           <Route path="*" element={<NotBuilt />} />
         </Routes>
       </div>

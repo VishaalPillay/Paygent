@@ -19,7 +19,7 @@ from fastapi.responses import StreamingResponse
 
 from .. import config
 from ..agents import tools
-from ..agents.llm import GeminiClient
+from ..agents.llm import GeminiClient, GroqClient, get_llm
 from ..agents.loop import run as run_reconciliation
 from ..db import conn as db
 
@@ -28,13 +28,13 @@ router = APIRouter()
 PACING_SECONDS = 0.85
 TRACE_FIXTURE = Path(__file__).resolve().parents[2] / "frontend" / "src" / "mock" / "trace.json"
 
-_llm: GeminiClient | None = None
+_llm: GeminiClient | GroqClient | None = None
 
 
-def _get_llm() -> GeminiClient:
+def _get_llm() -> GeminiClient | GroqClient:
     global _llm
     if _llm is None:
-        _llm = GeminiClient()
+        _llm = get_llm()
     return _llm
 
 

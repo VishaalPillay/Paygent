@@ -7,6 +7,19 @@
       "runtimeArgs": ["run", "dev"],
       "cwd": "frontend",
       "port": 5173
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "uvicorn",
+      "runtimeArgs": ["backend.main:app", "--reload", "--port", "8000"],
+      "port": 8000
+    },
+    {
+      "name": "shop",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:shop"],
+      "cwd": "frontend",
+      "port": 5174
     }
   ]
 }
