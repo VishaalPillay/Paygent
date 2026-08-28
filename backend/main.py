@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse  # noqa: E402
 
 from .api.cases import router as cases_router  # noqa: E402
 from .api.chat import router as chat_router  # noqa: E402
+from .api.demo import reset_live_demo_data  # noqa: E402
 from .api.demo import router as demo_router  # noqa: E402
 from .api.mandates import router as mandates_router  # noqa: E402
 from .api.stream import router as stream_router  # noqa: E402
@@ -51,6 +52,15 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
     """
     return JSONResponse(status_code=500, content={
         "error": {"code": "INTERNAL_ERROR", "message": str(exc)}})
+
+
+@app.on_event("startup")
+def _reset_live_demo_data_on_boot() -> None:
+    """Every process start (including uvicorn --reload's restarts) is a clean
+    slate for anything the live demo created — a Ctrl+C and re-run must never
+    resurface an old abandoned cart or scenario run. `scripts/seed.py`'s dataset
+    is untouched; only the `ses_live_*` prefix is ever wiped."""
+    reset_live_demo_data()
 
 
 app.include_router(razorpay_router, prefix="/api")

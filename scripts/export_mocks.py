@@ -109,7 +109,12 @@ def case_row(r) -> dict:
         "guardrail_checks": payload.get("guardrail_checks", []),
         "actions": payload.get("actions", []),
         "evidence": payload.get("evidence", {}),
-        "trace_available": payload.get("trace_available", False),
+        # Matches backend/api/cases.py::_case_to_dict exactly: whether a case CAN
+        # be investigated live, derived from its resolver — not whether it HAS
+        # been (payload only ever gets this key once a trace has actually run,
+        # via api/stream.py's _persist_conclusion, so reading it here made every
+        # never-yet-investigated case mock as trace_available=false).
+        "trace_available": r["resolver"] == "RECONCILIATION",
         "created_at": r["created_at"], "updated_at": r["updated_at"],
     }
 

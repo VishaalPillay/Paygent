@@ -1,25 +1,25 @@
 {
-  "gross_intended_inr": 385210184.75,
-  "realised_inr": 97509461.9,
+  "gross_intended_inr": 385251575.75,
+  "realised_inr": 97500863.9,
   "buckets": [
     {
       "id": "B1",
       "stage": "Checkout initiated \u2192 Payment attempted",
       "basis": "deterministic",
-      "entering_inr": 385210184.75,
-      "leaked_inr": 234470516.6,
-      "exiting_inr": 150739668.15,
-      "case_count": 18571,
+      "entering_inr": 385251575.75,
+      "leaked_inr": 234507608.6,
+      "exiting_inr": 150743967.15,
+      "case_count": 18574,
       "detail": "Carts with no payment attempt"
     },
     {
       "id": "B2",
       "stage": "Payment attempted \u2192 Payment authorised",
       "basis": "deterministic",
-      "entering_inr": 150739668.15,
-      "leaked_inr": 17925277.7,
+      "entering_inr": 150743967.15,
+      "leaked_inr": 17929576.7,
       "exiting_inr": 132814390.45,
-      "case_count": 1456,
+      "case_count": 1457,
       "detail": "Declines, technical and business"
     },
     {
@@ -27,18 +27,18 @@
       "stage": "Payment authorised \u2192 Order recognised",
       "basis": "deterministic",
       "entering_inr": 132814390.45,
-      "leaked_inr": 4527665.95,
-      "exiting_inr": 128286724.5,
-      "case_count": 370,
+      "leaked_inr": 4536263.95,
+      "exiting_inr": 128278126.5,
+      "case_count": 372,
       "detail": "Money captured against no order"
     },
     {
       "id": "B4",
       "stage": "Order recognised \u2192 Settled to bank",
       "basis": "modelled",
-      "entering_inr": 128286724.5,
+      "entering_inr": 128278126.5,
       "leaked_inr": 13618918.04,
-      "exiting_inr": 114667806.46,
+      "exiting_inr": 114659208.46,
       "case_count": 1007,
       "detail": "Fees, holds and short-pay"
     },
@@ -46,9 +46,9 @@
       "id": "B5",
       "stage": "Settled to bank \u2192 Net of reversals",
       "basis": "deterministic",
-      "entering_inr": 114667806.46,
+      "entering_inr": 114659208.46,
       "leaked_inr": 16529801.94,
-      "exiting_inr": 98138004.52,
+      "exiting_inr": 98129406.52,
       "case_count": 1320,
       "detail": "Refunds and chargebacks"
     },
@@ -56,9 +56,9 @@
       "id": "B6",
       "stage": "Net of reversals \u2192 Realised",
       "basis": "modelled",
-      "entering_inr": 98138004.52,
+      "entering_inr": 98129406.52,
       "leaked_inr": 628542.62,
-      "exiting_inr": 97509461.9,
+      "exiting_inr": 97500863.9,
       "case_count": 379,
       "detail": "Statutory credits never reclaimed"
     }

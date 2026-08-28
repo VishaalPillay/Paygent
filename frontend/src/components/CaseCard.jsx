@@ -1,6 +1,9 @@
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { inrExact, deadlineLabel, humanBreak, BASIS_LABEL } from '../lib/format'
 import { rise } from '../lib/motion'
+
+const MotionLink = motion(Link)
 
 /** One row in the recovery queue.
  *
@@ -14,7 +17,7 @@ export default function CaseCard({ c, now, index = 0 }) {
   const mark = dl.overdue ? 'bg-oxblood' : dl.urgent ? 'bg-ochre' : 'bg-rule-strong'
 
   return (
-    <motion.article variants={rise} custom={index}
+    <MotionLink to={`/cases/${c.case_id}`} variants={rise} custom={index}
       className="row-hover group grid grid-cols-[3px_1fr_auto] gap-5 items-stretch
                  border-t border-rule px-4 py-5 -mx-4 cursor-pointer">
       {/* items-stretch, not items-start — the mark is a margin rule running the
@@ -65,6 +68,6 @@ export default function CaseCard({ c, now, index = 0 }) {
           {dl.text}
         </div>
       </div>
-    </motion.article>
+    </MotionLink>
   )
 }

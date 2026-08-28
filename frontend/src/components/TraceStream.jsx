@@ -9,7 +9,7 @@ const EVENT_NAMES = ['thinking', 'tool_call', 'tool_result', 'guardrail', 'concl
  * the agent think rather than seeing a wall of text appear all at once. Pacing
  * (~850ms between events) is the server's job; this just renders what arrives.
  */
-export default function TraceStream({ caseId }) {
+export default function TraceStream({ caseId, onDone }) {
   const [events, setEvents] = useState([])
   const [status, setStatus] = useState('idle') // idle | connecting | live | done
   const esRef = useRef(null)
@@ -28,12 +28,13 @@ export default function TraceStream({ caseId }) {
         const data = JSON.parse(e.data)
         setEvents((prev) => [...prev, data])
         setStatus(name === 'done' ? 'done' : 'live')
-        if (name === 'done') es.close()
+        if (name === 'done') { es.close(); onDone?.() }
       })
     })
     es.onerror = () => { setStatus((s) => (s === 'done' ? s : 'done')); es.close() }
 
     return () => es.close()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caseId])
 
   return (

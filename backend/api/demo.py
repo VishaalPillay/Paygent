@@ -38,6 +38,41 @@ router = APIRouter()
 _ONE_JOIN_SQL = SCANNER_JOIN_SQL + " WHERE p.payment_id = ?"
 
 
+def reset_live_demo_data() -> None:
+    """Wipe every row a live demo session created (`ses_live_*` — abandoned carts
+    and reconciliation-scenario runs alike) so every fresh backend process starts
+    from a clean slate, without touching `scripts/seed.py`'s dataset (which never
+    uses that prefix). Called once at startup — see `main.py` — so restarting the
+    backend during testing never leaves a stale cart/conversation behind for the
+    dashboard to rediscover.
+
+    Deletion order follows the foreign-key graph child-first: case_signals before
+    cases before signals (cases.signal_id points at signals), inventory/accounting
+    before orders, orders before payments before checkout_sessions.
+    """
+    conn = db.connect()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "DELETE FROM case_signals WHERE case_id IN "
+            "(SELECT case_id FROM cases WHERE session_id LIKE 'ses_live_%')")
+        cur.execute("DELETE FROM cases WHERE session_id LIKE 'ses_live_%'")
+        cur.execute("DELETE FROM signals WHERE session_id LIKE 'ses_live_%'")
+        cur.execute(
+            "DELETE FROM inventory_events WHERE order_id IN "
+            "(SELECT order_id FROM orders WHERE session_id LIKE 'ses_live_%')")
+        cur.execute(
+            "DELETE FROM accounting_entries WHERE order_id IN "
+            "(SELECT order_id FROM orders WHERE session_id LIKE 'ses_live_%')")
+        cur.execute("DELETE FROM orders WHERE session_id LIKE 'ses_live_%'")
+        cur.execute("DELETE FROM payments WHERE session_id LIKE 'ses_live_%'")
+        cur.execute("DELETE FROM checkout_sessions WHERE session_id LIKE 'ses_live_%'")
+        conn.commit()
+    finally:
+        conn.close()
+    _LIVE_CART_SKUS.clear()
+
+
 def _iso(dt: datetime) -> str:
     return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 

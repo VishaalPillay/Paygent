@@ -25,23 +25,20 @@ export default function CartAgentPanel() {
   // Persisted, not just a ref — a page refresh mid-demo must not re-open a
   // conversation the agent already started (and burn another LLM call doing it).
   const seenCaseId = useRef(sessionStorage.getItem('paygent.cartAgent.seenCaseId'))
+  // Whether *this mount* has fetched/opened a conversation at least once yet. A
+  // ref, not React state — poll() below is set up once (empty deps) and would
+  // otherwise close over a stale `conversationId` forever.
+  const hydrated = useRef(false)
   const scrollRef = useRef(null)
-
-  // A page refresh restores `seenCaseId` from storage but not React state — fetch
-  // (never re-open) whatever the backend already has for it. An empty message on
-  // an existing conversation is a no-op read, not a turn, so this costs no LLM call.
-  useEffect(() => {
-    const restored = seenCaseId.current
-    if (!restored) return
-    const cnv = `cnv_${restored}`
-    setConversationId(cnv)
-    send(cnv, '', null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   // Poll for a newly abandoned cart. A fresh case_id — not just "a cart exists"
   // — is what triggers the agent opening a new conversation, so refreshing the
-  // page or a cart that was already handled doesn't restart it.
+  // page or a cart that was already handled doesn't restart it. This also covers
+  // the page-refresh case (`seenCaseId` restored from storage but React state
+  // isn't yet): hydrate it here, from this same real cart payload, rather than a
+  // separate effect that called `/api/chat` with no session_id/cart_value_inr —
+  // that made chat.py fall back to guessing an unrelated seeded cart whenever the
+  // backend had restarted and lost its in-process conversation store.
   useEffect(() => {
     let cancelled = false
     async function poll() {
@@ -49,13 +46,36 @@ export default function CartAgentPanel() {
         const res = await fetch('/api/carts/abandoned/latest')
         if (!res.ok) return
         const latest = await res.json()
-        if (cancelled || !latest || latest.case_id === seenCaseId.current) {
-          if (latest) setCart(latest) // known cart, but skip re-opening it
+        if (cancelled) return
+        if (!latest) {
+          // The backend has no live cart at all — most commonly because it just
+          // restarted and wiped its `ses_live_*` test data (see main.py). An
+          // already-open tab must not keep showing a conversation that no longer
+          // exists anywhere: reset back to the empty state and forget the stale
+          // case_id, so the next real abandonment is treated as genuinely new.
+          if (hydrated.current || seenCaseId.current) {
+            hydrated.current = false
+            seenCaseId.current = null
+            sessionStorage.removeItem('paygent.cartAgent.seenCaseId')
+            setCart(null)
+            setConversationId(null)
+            setMessages([])
+            setOffers([])
+            setError(null)
+          }
           return
         }
+        setCart(latest)
+        if (latest.case_id === seenCaseId.current) {
+          if (!hydrated.current) {
+            hydrated.current = true
+            await openConversation(latest)
+          }
+          return
+        }
+        hydrated.current = true
         seenCaseId.current = latest.case_id
         sessionStorage.setItem('paygent.cartAgent.seenCaseId', latest.case_id)
-        setCart(latest)
         await openConversation(latest)
       } catch { /* the panel must never crash the dashboard because polling failed */ }
     }

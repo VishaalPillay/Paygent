@@ -6,7 +6,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Dead mandate against a live subscription",
-      "summary": "\u20b940,062.64 per cycle uncollectable: mandate revoked by the customer, but the subscription is still active.",
+      "summary": "Rs 40,062.64 per cycle uncollectable: mandate revoked by the customer, but the subscription is still active.",
       "customer_id": "cus_003957",
       "session_id": null,
       "payment_id": null,
@@ -44,7 +44,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Dead mandate against a live subscription",
-      "summary": "\u20b943,295.24 per cycle uncollectable: mandate revoked by the customer, but the subscription is still active.",
+      "summary": "Rs 43,295.24 per cycle uncollectable: mandate revoked by the customer, but the subscription is still active.",
       "customer_id": "cus_003281",
       "session_id": null,
       "payment_id": null,
@@ -82,7 +82,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Dead mandate against a live subscription",
-      "summary": "\u20b942,013.81 per cycle uncollectable: mandate expired, but the subscription is still active.",
+      "summary": "Rs 42,013.81 per cycle uncollectable: mandate expired, but the subscription is still active.",
       "customer_id": "cus_003768",
       "session_id": null,
       "payment_id": null,
@@ -120,7 +120,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Dead mandate against a live subscription",
-      "summary": "\u20b942,006.31 per cycle uncollectable: mandate revoked by the customer, but the subscription is still active.",
+      "summary": "Rs 42,006.31 per cycle uncollectable: mandate revoked by the customer, but the subscription is still active.",
       "customer_id": "cus_003668",
       "session_id": null,
       "payment_id": null,
@@ -158,7 +158,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Dead mandate against a live subscription",
-      "summary": "\u20b941,689.94 per cycle uncollectable: mandate expired, but the subscription is still active.",
+      "summary": "Rs 41,689.94 per cycle uncollectable: mandate expired, but the subscription is still active.",
       "customer_id": "cus_002854",
       "session_id": null,
       "payment_id": null,
@@ -196,7 +196,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Autopay debit failed, subscription in grace",
-      "summary": "\u20b937,810.38 autopay debit failed and the grace period has run out.",
+      "summary": "Rs 37,810.38 autopay debit failed and the grace period has run out.",
       "customer_id": "cus_003062",
       "session_id": null,
       "payment_id": "pay_010632",
@@ -240,7 +240,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Dead mandate against a live subscription",
-      "summary": "\u20b943,135.34 per cycle uncollectable: mandate revoked by the customer, but the subscription is still active.",
+      "summary": "Rs 43,135.34 per cycle uncollectable: mandate revoked by the customer, but the subscription is still active.",
       "customer_id": "cus_002749",
       "session_id": null,
       "payment_id": null,
@@ -278,7 +278,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Autopay debit failed, subscription in grace",
-      "summary": "\u20b938,653.11 autopay debit failed and the grace period has run out.",
+      "summary": "Rs 38,653.11 autopay debit failed and the grace period has run out.",
       "customer_id": "cus_004223",
       "session_id": null,
       "payment_id": "pay_011793",
@@ -322,7 +322,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b923,976.38 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 23,976.38 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_000352",
       "session_id": "ses_027263",
       "payment_id": "pay_008750",
@@ -356,7 +356,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -366,7 +366,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Autopay debit failed, subscription in grace",
-      "summary": "\u20b926,987.93 autopay debit failed and the grace period has run out.",
+      "summary": "Rs 26,987.93 autopay debit failed and the grace period has run out.",
       "customer_id": "cus_003991",
       "session_id": null,
       "payment_id": "pay_011561",
@@ -410,7 +410,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Autopay debit failed, subscription in grace",
-      "summary": "\u20b922,111.00 autopay debit failed and the grace period has run out.",
+      "summary": "Rs 22,111.00 autopay debit failed and the grace period has run out.",
       "customer_id": "cus_004366",
       "session_id": null,
       "payment_id": "pay_011936",
@@ -454,7 +454,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b921,566.20 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 21,566.20 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_002023",
       "session_id": "ses_021459",
       "payment_id": "pay_002900",
@@ -488,7 +488,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -498,7 +498,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Autopay debit failed, subscription in grace",
-      "summary": "\u20b942,813.05 autopay debit failed and the grace period has run out.",
+      "summary": "Rs 42,813.05 autopay debit failed and the grace period has run out.",
       "customer_id": "cus_003072",
       "session_id": null,
       "payment_id": "pay_010642",
@@ -542,7 +542,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b921,080.13 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 21,080.13 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_001735",
       "session_id": "ses_026016",
       "payment_id": "pay_007490",
@@ -576,7 +576,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -586,7 +586,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b920,672.54 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 20,672.54 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_002071",
       "session_id": "ses_025145",
       "payment_id": "pay_006609",
@@ -620,7 +620,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -630,7 +630,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b920,662.53 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 20,662.53 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_001525",
       "session_id": "ses_020414",
       "payment_id": "pay_001850",
@@ -664,7 +664,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -674,7 +674,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b924,466.18 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 24,466.18 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_001405",
       "session_id": "ses_019715",
       "payment_id": "pay_001147",
@@ -708,7 +708,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -718,7 +718,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b924,389.35 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 24,389.35 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000085",
       "session_id": "ses_025847",
       "payment_id": "pay_007318",
@@ -752,7 +752,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -762,7 +762,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b920,309.31 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 20,309.31 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_000331",
       "session_id": "ses_019902",
       "payment_id": "pay_001334",
@@ -796,7 +796,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -806,7 +806,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b920,294.68 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 20,294.68 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_001007",
       "session_id": "ses_028048",
       "payment_id": "pay_009543",
@@ -840,7 +840,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -850,7 +850,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b924,304.71 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 24,304.71 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_002155",
       "session_id": "ses_024932",
       "payment_id": "pay_006394",
@@ -884,7 +884,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -894,7 +894,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b924,281.42 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 24,281.42 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_001375",
       "session_id": "ses_024532",
       "payment_id": "pay_005991",
@@ -928,7 +928,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -938,7 +938,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Dead mandate against a live subscription",
-      "summary": "\u20b940,434.13 per cycle uncollectable: mandate revoked by the customer, but the subscription is still active.",
+      "summary": "Rs 40,434.13 per cycle uncollectable: mandate revoked by the customer, but the subscription is still active.",
       "customer_id": "cus_004393",
       "session_id": null,
       "payment_id": null,
@@ -976,7 +976,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b924,054.98 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 24,054.98 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_002394",
       "session_id": "ses_027143",
       "payment_id": "pay_008629",
@@ -1010,7 +1010,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1020,7 +1020,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b919,882.97 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 19,882.97 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_001362",
       "session_id": "ses_027407",
       "payment_id": "pay_008895",
@@ -1054,7 +1054,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1064,7 +1064,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b919,664.89 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 19,664.89 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_000359",
       "session_id": "ses_018860",
       "payment_id": "pay_000289",
@@ -1098,7 +1098,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1108,7 +1108,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b919,582.24 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 19,582.24 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_001084",
       "session_id": "ses_026242",
       "payment_id": "pay_007720",
@@ -1142,7 +1142,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1152,7 +1152,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b919,454.76 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 19,454.76 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_001395",
       "session_id": "ses_022284",
       "payment_id": "pay_003728",
@@ -1186,7 +1186,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1196,7 +1196,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b923,337.97 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 23,337.97 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_001387",
       "session_id": "ses_028352",
       "payment_id": "pay_009849",
@@ -1230,7 +1230,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1240,7 +1240,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b923,017.37 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 23,017.37 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_002171",
       "session_id": "ses_027851",
       "payment_id": "pay_009343",
@@ -1274,7 +1274,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1284,7 +1284,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b922,699.00 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 22,699.00 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000685",
       "session_id": "ses_021872",
       "payment_id": "pay_003316",
@@ -1318,7 +1318,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1328,7 +1328,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Subscription predicted to lapse",
-      "summary": "\u20b9330,042.21 of annualised subscription value at 98% predicted churn risk.",
+      "summary": "Rs 330,042.21 of annualised subscription value at 98% predicted churn risk.",
       "customer_id": "cus_003599",
       "session_id": null,
       "payment_id": null,
@@ -1365,7 +1365,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b922,639.70 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 22,639.70 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_002441",
       "session_id": "ses_028076",
       "payment_id": "pay_009572",
@@ -1399,7 +1399,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1409,7 +1409,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b922,526.13 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 22,526.13 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_002337",
       "session_id": "ses_023260",
       "payment_id": "pay_004709",
@@ -1443,7 +1443,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1453,7 +1453,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b922,517.67 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 22,517.67 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_002181",
       "session_id": "ses_024849",
       "payment_id": "pay_006311",
@@ -1487,7 +1487,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1497,7 +1497,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b918,512.78 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 18,512.78 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_001075",
       "session_id": "ses_020647",
       "payment_id": "pay_002084",
@@ -1531,7 +1531,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1541,7 +1541,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b922,093.29 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 22,093.29 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_002311",
       "session_id": "ses_023552",
       "payment_id": "pay_005003",
@@ -1575,7 +1575,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1585,7 +1585,7 @@
       "status": "OPEN",
       "business_type": "SAAS",
       "title": "Subscription predicted to lapse",
-      "summary": "\u20b9367,691.99 of annualised subscription value at 85% predicted churn risk.",
+      "summary": "Rs 367,691.99 of annualised subscription value at 85% predicted churn risk.",
       "customer_id": "cus_003282",
       "session_id": null,
       "payment_id": null,
@@ -1622,7 +1622,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b921,843.15 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 21,843.15 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000929",
       "session_id": "ses_026213",
       "payment_id": "pay_007691",
@@ -1656,7 +1656,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1666,7 +1666,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b918,011.05 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 18,011.05 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_002418",
       "session_id": "ses_019388",
       "payment_id": "pay_000819",
@@ -1700,7 +1700,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1710,7 +1710,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b917,810.57 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 17,810.57 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_001634",
       "session_id": "ses_025246",
       "payment_id": "pay_006711",
@@ -1744,7 +1744,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1754,7 +1754,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b921,158.78 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 21,158.78 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000226",
       "session_id": "ses_027789",
       "payment_id": "pay_009280",
@@ -1788,7 +1788,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1798,7 +1798,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b920,792.44 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 20,792.44 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000537",
       "session_id": "ses_022722",
       "payment_id": "pay_004170",
@@ -1832,7 +1832,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1842,7 +1842,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b919,941.53 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 19,941.53 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_001661",
       "session_id": "ses_027394",
       "payment_id": "pay_008882",
@@ -1876,7 +1876,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1886,7 +1886,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b919,910.76 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 19,910.76 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000903",
       "session_id": "ses_026249",
       "payment_id": "pay_007727",
@@ -1920,7 +1920,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1930,7 +1930,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b919,759.11 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 19,759.11 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_001953",
       "session_id": "ses_021633",
       "payment_id": "pay_003076",
@@ -1964,7 +1964,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -1974,7 +1974,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b919,597.57 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 19,597.57 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000737",
       "session_id": "ses_021035",
       "payment_id": "pay_002473",
@@ -2008,7 +2008,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2018,7 +2018,7 @@
       "status": "AWAITING_APPROVAL",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b919,330.08 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 19,330.08 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_001148",
       "session_id": "ses_019710",
       "payment_id": "pay_001142",
@@ -2052,7 +2052,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2062,7 +2062,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b919,270.14 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 19,270.14 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000581",
       "session_id": "ses_022641",
       "payment_id": "pay_004088",
@@ -2096,7 +2096,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2106,7 +2106,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b919,229.28 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 19,229.28 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_001124",
       "session_id": "ses_027265",
       "payment_id": "pay_008752",
@@ -2140,7 +2140,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2150,7 +2150,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b915,919.89 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 15,919.89 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_002368",
       "session_id": "ses_028423",
       "payment_id": "pay_009921",
@@ -2184,7 +2184,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2194,7 +2194,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b915,878.25 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 15,878.25 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_000444",
       "session_id": "ses_021972",
       "payment_id": "pay_003416",
@@ -2228,7 +2228,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2238,7 +2238,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b918,760.27 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 18,760.27 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_001831",
       "session_id": "ses_019034",
       "payment_id": "pay_000465",
@@ -2272,7 +2272,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2282,7 +2282,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b918,712.82 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 18,712.82 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000522",
       "session_id": "ses_021163",
       "payment_id": "pay_002602",
@@ -2316,7 +2316,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2326,7 +2326,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b918,412.25 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 18,412.25 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000792",
       "session_id": "ses_026021",
       "payment_id": "pay_007496",
@@ -2360,7 +2360,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2370,7 +2370,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b918,147.02 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 18,147.02 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_002274",
       "session_id": "ses_021088",
       "payment_id": "pay_002527",
@@ -2404,7 +2404,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2414,7 +2414,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b918,028.98 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 18,028.98 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_000547",
       "session_id": "ses_019684",
       "payment_id": "pay_001116",
@@ -2448,7 +2448,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2458,7 +2458,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b918,014.56 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 18,014.56 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_001583",
       "session_id": "ses_024182",
       "payment_id": "pay_005638",
@@ -2492,7 +2492,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2502,7 +2502,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Paid and reserved, never shipped",
-      "summary": "\u20b917,970.41 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
+      "summary": "Rs 17,970.41 at risk. Ledgers disagree: payment CAPTURED, order CONFIRMED, accounting DEFERRED.",
       "customer_id": "cus_001248",
       "session_id": "ses_025590",
       "payment_id": "pay_007059",
@@ -2536,7 +2536,7 @@
         "failure_reason_code": null,
         "state_is_legal": true
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2546,7 +2546,7 @@
       "status": "OPEN",
       "business_type": "ECOMMERCE",
       "title": "Refunded after the goods shipped",
-      "summary": "\u20b914,963.30 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
+      "summary": "Rs 14,963.30 at risk. Ledgers disagree: payment REFUNDED, order FULFILLED, accounting REVENUE_RECOGNIZED.",
       "customer_id": "cus_000440",
       "session_id": "ses_021620",
       "payment_id": "pay_003062",
@@ -2580,7 +2580,7 @@
         "failure_reason_code": null,
         "state_is_legal": false
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     }
@@ -2687,7 +2687,7 @@
         "largest_inr": 3431.71,
         "smallest_inr": 26.49
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2722,7 +2722,7 @@
         "largest_inr": 7572.87,
         "smallest_inr": 1518.5
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2757,7 +2757,7 @@
         "largest_inr": 2262.25,
         "smallest_inr": 5.06
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2792,7 +2792,7 @@
         "largest_inr": 558.77,
         "smallest_inr": 5.45
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2827,7 +2827,7 @@
         "largest_inr": 4536.74,
         "smallest_inr": 3124.32
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2862,7 +2862,7 @@
         "largest_inr": 201.81,
         "smallest_inr": 50.39
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     },
@@ -2897,16 +2897,16 @@
         "largest_inr": 80.59,
         "smallest_inr": 9.15
       },
-      "trace_available": false,
+      "trace_available": true,
       "created_at": "2026-08-27T18:00:00Z",
       "updated_at": "2026-08-27T18:00:00Z"
     }
   ],
-  "total": 1601,
+  "total": 1607,
   "limit": 60,
   "offset": 0,
   "totals_at_risk": {
     "deterministic_inr": 24293177.53,
-    "modelled_inr": 8413389.93
+    "modelled_inr": 8417840.97
   }
 }

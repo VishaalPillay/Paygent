@@ -29,25 +29,25 @@
             "passed": true,
             "blocking": true,
             "message": "Mandate mdt_000260 is ACTIVE. Safe to schedule a retry.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:14Z"
           },
           {
             "name": "amount_within_mandate_cap",
             "passed": true,
             "blocking": true,
             "message": "Rs 9,997.86 is within the Rs 21,551.68 mandate cap.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:14Z"
           },
           {
             "name": "attempts_remain_in_cycle",
             "passed": true,
             "blocking": true,
             "message": "3 attempt(s) remain this cycle.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:14Z"
           }
         ]
       },
-      "predicted_success": 0.6848,
+      "predicted_success": 0.7644,
       "predicted_basis": "modelled",
       "naive": {
         "strategy": "NAIVE",
@@ -56,11 +56,11 @@
             "attempt_no": 2,
             "slot_at": "2026-09-01T10:00:00Z",
             "window": "PEAK",
-            "predicted_success": 0.6164,
+            "predicted_success": 0.6246,
             "reason": "Blind retry on the 1st of next cycle, no slot selection"
           }
         ],
-        "expected_recovery_inr": 6162.68,
+        "expected_recovery_inr": 6244.66,
         "basis": "modelled"
       },
       "sequenced": {
@@ -70,28 +70,28 @@
             "attempt_no": 2,
             "slot_at": "2026-08-28T22:30:00Z",
             "window": "NON_PEAK",
-            "predicted_success": 0.6848,
+            "predicted_success": 0.7644,
             "reason": "Highest predicted success among non-peak slots this cycle"
           },
           {
             "attempt_no": 3,
             "slot_at": "2026-09-08T22:30:00Z",
             "window": "NON_PEAK",
-            "predicted_success": 0.9943,
+            "predicted_success": 0.9911,
             "reason": "Highest predicted success among non-peak slots this cycle"
           },
           {
             "attempt_no": 4,
             "slot_at": "2026-09-09T22:30:00Z",
             "window": "NON_PEAK",
-            "predicted_success": 0.9585,
+            "predicted_success": 0.9508,
             "reason": "Highest predicted success among non-peak slots this cycle"
           }
         ],
-        "expected_recovery_inr": 9997.11,
+        "expected_recovery_inr": 9996.83,
         "basis": "modelled"
       },
-      "uplift_inr": 3834.43,
+      "uplift_inr": 3752.17,
       "uplift_basis": "modelled"
     },
     {
@@ -123,25 +123,25 @@
             "passed": true,
             "blocking": true,
             "message": "Mandate mdt_000384 is ACTIVE. Safe to schedule a retry.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:15Z"
           },
           {
             "name": "amount_within_mandate_cap",
             "passed": true,
             "blocking": true,
             "message": "Rs 44,886.31 is within the Rs 59,094.21 mandate cap.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:15Z"
           },
           {
             "name": "attempts_remain_in_cycle",
             "passed": true,
             "blocking": true,
             "message": "3 attempt(s) remain this cycle.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:15Z"
           }
         ]
       },
-      "predicted_success": 0.9909,
+      "predicted_success": 0.9859,
       "predicted_basis": "modelled",
       "naive": {
         "strategy": "NAIVE",
@@ -150,11 +150,11 @@
             "attempt_no": 2,
             "slot_at": "2026-09-01T10:00:00Z",
             "window": "PEAK",
-            "predicted_success": 0.4725,
+            "predicted_success": 0.4917,
             "reason": "Blind retry on the 1st of next cycle, no slot selection"
           }
         ],
-        "expected_recovery_inr": 21208.78,
+        "expected_recovery_inr": 22070.6,
         "basis": "modelled"
       },
       "sequenced": {
@@ -164,28 +164,28 @@
             "attempt_no": 2,
             "slot_at": "2026-09-06T15:30:00Z",
             "window": "NON_PEAK",
-            "predicted_success": 0.9909,
+            "predicted_success": 0.9859,
             "reason": "Highest predicted success among non-peak slots this cycle"
           },
           {
             "attempt_no": 3,
             "slot_at": "2026-09-07T15:30:00Z",
             "window": "NON_PEAK",
-            "predicted_success": 0.9629,
+            "predicted_success": 0.9414,
             "reason": "Highest predicted success among non-peak slots this cycle"
           },
           {
             "attempt_no": 4,
             "slot_at": "2026-09-08T15:30:00Z",
             "window": "NON_PEAK",
-            "predicted_success": 0.9552,
+            "predicted_success": 0.9321,
             "reason": "Highest predicted success among non-peak slots this cycle"
           }
         ],
-        "expected_recovery_inr": 44885.63,
+        "expected_recovery_inr": 44883.79,
         "basis": "modelled"
       },
-      "uplift_inr": 23676.85,
+      "uplift_inr": 22813.19,
       "uplift_basis": "modelled"
     },
     {
@@ -217,21 +217,21 @@
             "passed": false,
             "blocking": true,
             "message": "Mandate mdt_001191 is REVOKED. This is structural, not a timing failure - no retry can succeed. Do not spend an attempt on it.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:16Z"
           },
           {
             "name": "amount_within_mandate_cap",
             "passed": true,
             "blocking": true,
             "message": "Rs 44,962.07 is within the Rs 118,584.07 mandate cap.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:16Z"
           },
           {
             "name": "attempts_remain_in_cycle",
             "passed": true,
             "blocking": true,
             "message": "3 attempt(s) remain this cycle.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:16Z"
           }
         ]
       },
@@ -281,21 +281,21 @@
             "passed": true,
             "blocking": true,
             "message": "Mandate mdt_001745 is ACTIVE. Safe to schedule a retry.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:16Z"
           },
           {
             "name": "amount_within_mandate_cap",
             "passed": false,
             "blocking": true,
             "message": "Rs 44,908.30 exceeds the Rs 31,881.12 mandate cap. The bank will decline this every time - retrying wastes an attempt on a failure that cannot resolve itself.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:16Z"
           },
           {
             "name": "attempts_remain_in_cycle",
             "passed": false,
             "blocking": true,
             "message": "All 4 attempts for this cycle are used. NPCI rules make this cycle dead until the next billing period - no retry can be scheduled.",
-            "evaluated_at": "2026-08-27T23:38:59Z"
+            "evaluated_at": "2026-08-28T03:59:16Z"
           }
         ]
       },
@@ -323,28 +323,28 @@
   "afa_threshold_inr": 15000.0,
   "model_card": {
     "available": true,
-    "auc": 0.786,
+    "auc": 0.785,
     "trained_at": "2026-08-27T18:00:00Z",
     "features": [
       {
         "name": "days_since_predicted_salary",
-        "gain_pct": 59.4
+        "gain_pct": 59.6
       },
       {
         "name": "amount_inr",
-        "gain_pct": 11.8
+        "gain_pct": 11.0
       },
       {
         "name": "amount_to_cap_ratio",
-        "gain_pct": 9.4
+        "gain_pct": 9.2
       },
       {
         "name": "day_of_month",
-        "gain_pct": 5.8
+        "gain_pct": 6.3
       },
       {
         "name": "hour",
-        "gain_pct": 5.2
+        "gain_pct": 4.8
       }
     ]
   },

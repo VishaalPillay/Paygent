@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import { MotionConfig } from 'framer-motion'
 import Nav from './components/Nav'
 import CommandCenter from './pages/CommandCenter'
+import CaseDetail from './pages/CaseDetail'
 import Conversations from './pages/Conversations'
 import MandateBoard from './pages/MandateBoard'
 
@@ -21,6 +22,7 @@ export default function App() {
             <CommandCenter onLoaded={(s) => setGeneratedAt(s.generated_at)} />} />
           <Route path="/conversations" element={<Conversations />} />
           <Route path="/mandates" element={<MandateBoard />} />
+          <Route path="/cases/:caseId" element={<CaseDetail />} />
           <Route path="*" element={<NotBuilt />} />
         </Routes>
       </div>

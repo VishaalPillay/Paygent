@@ -316,8 +316,17 @@ TOOL_SPECS = [
                     "enum": ["CREATE_ORDER", "ISSUE_REFUND", "CANCEL_ORDER",
                              "ISSUE_CREDIT_NOTE", "NO_ACTION"],
                 },
-                "payment_id": {"type": "string"},
-                "order_id": {"type": "string"},
+                # No "type" on these two, deliberately: both are optional (not in
+                # "required" below) and genuinely absent for some action types
+                # (CREATE_ORDER has no order_id yet). Gemini omits an inapplicable
+                # optional arg outright, but Groq's models sometimes emit it as
+                # explicit JSON null — which a declared "string" type rejects with
+                # a hard 400 (Groq validates tool-call args against the schema
+                # server-side; Gemini doesn't). An untyped property accepts any
+                # value, null included, on both providers — verified directly
+                # against Groq's API, not just reasoned about.
+                "payment_id": {"description": "The payment id, if this action concerns one."},
+                "order_id": {"description": "The order id, if this action concerns one."},
                 "confidence": {"type": "number"},
                 "reasoning": {"type": "string"},
             },
